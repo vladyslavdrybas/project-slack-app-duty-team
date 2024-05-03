@@ -1,0 +1,91 @@
+services:
+  php:
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-php-${APP_ENV:-none}
+    image: vd_php_base:1.0
+    build:
+        args:
+          APP_ENV: ${APP_ENV}
+    env_file:
+      - .env
+    networks:
+      - default
+      - database_network
+    depends_on:
+      - database
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - ./app:/app:rw
+
+###> doctrine/doctrine-bundle ###
+  database:
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-db-${APP_ENV:-none}
+    image: vd_postgres_base:1.0
+    build:
+      args:
+        APP_ENV: ${APP_ENV}
+    env_file:
+      - .env
+    networks:
+      default:
+        aliases:
+          - database
+      database_network:
+        aliases:
+          - "${DATABASE_ALIAS}"
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+  web:
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-api-${API_VERSION:-1.0}-web-${APP_ENV:-none}
+    image: vd_nginx_base:1.0
+    build:
+      args:
+        APP_ENV: ${APP_ENV}
+    env_file:
+      - .env
+    networks:
+      - proxy_network
+      - default
+    depends_on:
+      - php
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.rule=Host(`${HOST}`) && PathPrefix(`/oauth`, `/api/v${API_VERSION}`, `/_profiler`)"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.rule=Host(`${HOST}`) && PathPrefix(`/oauth`, `/api/v${API_VERSION}`, `/_profiler`)"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.entrypoints=web"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.entrypoints=websecure"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls=true"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.tls.domains[0].main=${HOST}"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-http.middlewares=${PROJECT_NAME}-${SERVICE_NAME}-https"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-apiprefix.stripprefixregex.regex=/api/v[0-9]+(?:\\.[0-9]+)?/"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-header.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,HEAD,PATCH,DELETE"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-header.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-header.headers.accesscontrolalloworiginlist=*"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-header.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.${PROJECT_NAME}-${SERVICE_NAME}-header.headers.addvaryheader=true"
+      - "traefik.http.routers.${PROJECT_NAME}-${SERVICE_NAME}-https.middlewares=${PROJECT_NAME}-${SERVICE_NAME}-apiprefix,${PROJECT_NAME}-${SERVICE_NAME}-header"
+    volumes:
+      - ./app/public:/app/public
+      - ./tmp/log/nginx/:/var/log/nginx
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  database_data:
+    name: ${PROJECT_NAME}_${SERVICE_NAME}_database_data
+###< doctrine/doctrine-bundle ###
+
+networks:
+  proxy_network:
+    name: ${PROXY_NETWORK}
+    external: true
+  database_network:
+    name: ${DATABASE_NETWORK}
+    external: true
+  default:
+    name: ${APP_NETWORK}
+    external: false

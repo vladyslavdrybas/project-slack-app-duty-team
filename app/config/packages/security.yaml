@@ -1,0 +1,90 @@
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'bcrypt'
+  
+  providers:
+    email_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+    username_provider:
+      entity:
+        class: App\Entity\User
+        property: username
+    id_provider:
+      entity:
+        class: App\Entity\User
+        property: id
+  
+  role_hierarchy:
+    ROLE_USER: [IS_AUTHENTICATED_FULLY]
+  
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    api_oauth:
+#      pattern: '^/%service_name%/api/v%api_version%/auth/register'
+      pattern: '^/oauth'
+      security: false
+      stateless: false
+    api_register:
+#      pattern: '^/%service_name%/api/v%api_version%/auth/register'
+      pattern: '^/auth/register'
+      security: false
+    api_token_refresh:
+#      pattern: '^/%service_name%/api/v%api_version%/auth/token/refresh'
+      pattern: '^/auth/token/refresh'
+      stateless: true
+      provider: id_provider
+      refresh_jwt: ~
+    api_login:
+#      pattern: '^/%service_name%/api/v%api_version%/auth/login'
+      pattern: '^/auth/login'
+      stateless: true
+      json_login:
+        provider: email_provider
+        username_path: email
+        password_path: password
+#        check_path: '/%service_name%/api/v%api_version%/auth/login' #same as the route configured in config/routes.yaml
+        check_path: '/auth/login' #same as the route configured in config/routes.yaml
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+    api:
+#      pattern:   '^/%service_name%/api'
+      pattern:   '^/'
+      stateless: true
+      provider: username_provider
+      entry_point: jwt
+      user_checker: App\Security\UserChecker
+      jwt:
+        authenticator: api.custom_jwt_authenticator
+      refresh_jwt:
+#        check_path: '/%service_name%/api/v%api_version%/auth/token/refresh'
+        check_path: '/auth/token/refresh'
+      logout:
+        path: api_auth_logout
+  
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+#    - { path: '^%service_name%/api/v%api_version%/auth/(login|register|token/refresh)', roles: PUBLIC_ACCESS }
+#    - { path: '^%service_name%/api', roles: IS_AUTHENTICATED_FULLY }
+    - { path: '^/$', roles: PUBLIC_ACCESS }
+    - { path: '^/check', roles: PUBLIC_ACCESS }
+    - { path: '^/oauth/', roles: PUBLIC_ACCESS }
+    - { path: '^/auth/(login|register|token/refresh)', roles: PUBLIC_ACCESS }
+    - { path: '^/', roles: IS_AUTHENTICATED_FULLY }
+
+when@test:
+  security:
+    password_hashers:
+      # By default, password hashers are resource intensive and take time. This is
+      # important to generate secure password hashes. In tests however, secure hashes
+      # are not important, waste resources and increase test times. The following
+      # reduces the work factor to the lowest possible values.
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4 # Lowest possible value for bcrypt
+        time_cost: 3 # Lowest possible value for argon
+        memory_cost: 10 # Lowest possible value for argon

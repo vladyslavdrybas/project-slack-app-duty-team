@@ -1,0 +1,4 @@
+services:
+  database:
+    ports:
+      - "${DATABASE_PUBLIC_PORT}:5432"
