@@ -2,3 +2,6 @@ services:
   database:
     ports:
       - "${DATABASE_PUBLIC_PORT}:5432"
+  web:
+    ports:
+      - "${LOCALHOST_PUBLIC_PORT}:80"

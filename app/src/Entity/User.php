@@ -59,10 +59,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(name: "is_deleted", type: Types::BOOLEAN, options: ["default" => false])]
     protected bool $isDeleted = false;
 
-    #[ORM\ManyToOne(targetEntity: SubscriptionPlan::class)]
-    #[ORM\JoinColumn(name:'subscription_id', referencedColumnName: 'id', nullable: true)]
-    protected ?SubscriptionPlan $subscription = null;
-
     public function isEqualTo(SecurityUserInterface $user): bool
     {
         return $user->getUserIdentifier() === $this->getUserIdentifier();
@@ -231,21 +227,5 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setLastname(?string $lastname): void
     {
         $this->lastname = $lastname;
-    }
-
-    /**
-     * @return \App\Entity\SubscriptionPlan|null
-     */
-    public function getSubscription(): ?SubscriptionPlan
-    {
-        return $this->subscription;
-    }
-
-    /**
-     * @param \App\Entity\SubscriptionPlan|null $subscription
-     */
-    public function setSubscription(?SubscriptionPlan $subscription): void
-    {
-        $this->subscription = $subscription;
     }
 }
