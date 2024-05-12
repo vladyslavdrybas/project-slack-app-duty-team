@@ -1,0 +1,15 @@
+{
+  "token": "UJgP8ayNRekblYLwTfW9swvr",
+  "team_id": "T073G7T7JQY",
+  "team_domain": "vladyslavdryb-tdt2059",
+  "channel_id": "D073JLYEMQQ",
+  "channel_name": "directmessage",
+  "user_id": "U072CSZ2M2T",
+  "user_name": "ukdvvw",
+  "command": "/skills-add",
+  "text": "php; javascript; back-end development; docker; redis; project management; team lead; linux, something else",
+  "api_app_id": "A072TBG8YEP",
+  "is_enterprise_install": "false",
+  "response_url": "https://hooks.slack.com/commands/T073G7T7JQY/7097347992998/aAR7hD7mE7V7PSc8gIt4A0vJ",
+  "trigger_id": "7106452075300.7118265256848.c1645c7dc0ba2c2330fa800d08b1c8cb"
+}

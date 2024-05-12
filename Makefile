@@ -23,3 +23,5 @@ app-stop-local:
 	docker compose -f docker-compose.yml -f docker-compose.local.yml down
 env-build:
 	./env-builder.sh
+proxy-run:
+	docker run --net=host -it -e NGROK_AUTHTOKEN=2EifADVOC9dJoKzFLswzz6rl03u_7bsD5x5wK2UouWdmNja6u ngrok/ngrok:latest http ${LOCALHOST_PUBLIC_PORT}

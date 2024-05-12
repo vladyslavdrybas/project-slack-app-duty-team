@@ -1,0 +1,49 @@
+{
+  "token": "UJgP8ayNRekblYLwTfW9swvr",
+  "team_id": "T073G7T7JQY",
+  "context_team_id": "T073G7T7JQY",
+  "context_enterprise_id": null,
+  "api_app_id": "A072TBG8YEP",
+  "event": {
+    "user": "U072CSZ2M2T",
+    "type": "message",
+    "ts": "1715505788.946499",
+    "client_msg_id": "d5dd2921-6891-4776-9f2c-f5af8236ecf1",
+    "text": "tynjyj7",
+    "team": "T073G7T7JQY",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "g09KQ",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "channel": "D073JLYEMQQ",
+    "event_ts": "1715505788.946499",
+    "channel_type": "im"
+  },
+  "type": "event_callback",
+  "event_id": "Ev073EJGFRED",
+  "event_time": 1715505788,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T073G7T7JQY",
+      "user_id": "U072VPS2VQT",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false,
+  "event_context": "4-eyJldCI6Im1lc3NhZ2UiLCJ0aWQiOiJUMDczRzdUN0pRWSIsImFpZCI6IkEwNzJUQkc4WUVQIiwiY2lkIjoiRDA3M0pMWUVNUVEifQ"
+}
