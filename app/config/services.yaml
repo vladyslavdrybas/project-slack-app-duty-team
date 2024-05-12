@@ -7,6 +7,7 @@ parameters:
   table_prefix: 'smfn_'
   api_version: '%env(API_VERSION)%'
   service_name: '%env(SERVICE_NAME)%'
+  slack_bot_api_token: '%env(SLACK_BOT_API_TOKEN)%'
 
 services:
     # default configuration for services in *this* file
