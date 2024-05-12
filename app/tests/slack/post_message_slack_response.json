@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "channel": "D073JLYEMQQ",
+  "ts": "1715516322.619329",
+  "message": {
+    "user": "U072VPS2VQT",
+    "type": "message",
+    "ts": "1715516322.619329",
+    "bot_id": "B072YBM2XNY",
+    "app_id": "A072TBG8YEP",
+    "text": "thank you for your request. id: 1bfb47",
+    "team": "T073G7T7JQY",
+    "bot_profile": {
+      "id": "B072YBM2XNY",
+      "app_id": "A072TBG8YEP",
+      "name": "DutyTeam",
+      "icons": {
+        "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+        "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+        "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+      },
+      "deleted": false,
+      "updated": 1715336384,
+      "team_id": "T073G7T7JQY"
+    },
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "qPE",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "thank you for your request. id: 1bfb47"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "warning": "missing_charset",
+  "response_metadata": {
+    "warnings": [
+      "missing_charset"
+    ]
+  }
+}

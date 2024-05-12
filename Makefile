@@ -24,4 +24,4 @@ app-stop-local:
 env-build:
 	./env-builder.sh
 proxy-run:
-	docker run --net=host -it -e NGROK_AUTHTOKEN=2EifADVOC9dJoKzFLswzz6rl03u_7bsD5x5wK2UouWdmNja6u ngrok/ngrok:latest http ${LOCALHOST_PUBLIC_PORT}
+	docker run --net=host -it -e NGROK_AUTHTOKEN=${NGROK_AUTH_TOKEN} ngrok/ngrok:latest http ${LOCALHOST_PUBLIC_PORT}

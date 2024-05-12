@@ -9,6 +9,14 @@ framework:
       cookie_secure: auto
       cookie_samesite: lax
 
+    http_client:
+      scoped_clients:
+        slack.client:
+          base_uri: 'https://slack.com'
+          auth_bearer: '%env(SLACK_BOT_API_TOKEN)%'
+          headers:
+            Accept: 'application/json; charset=utf-8'
+            
     #esi: true
     #fragments: true
     php_errors:
