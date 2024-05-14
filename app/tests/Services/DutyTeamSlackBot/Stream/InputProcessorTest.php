@@ -45,20 +45,6 @@ class InputProcessorTest extends UnitTestCase
         $this->assertInstanceOf(CommandList::class, $dto->command);
     }
 
-    public function testReceiveCommandDetectCommandType(): void
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
-    public function testReceiveCommandValidateCommandData(): void
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
-
     public function testReceiveCommandConvertText(): void
     {
         $this->markTestIncomplete(
@@ -81,6 +67,13 @@ class InputProcessorTest extends UnitTestCase
     }
 
     public function testReceiveCommandFindOrCreateUser(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandProcessor(): void
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
