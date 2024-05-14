@@ -15,9 +15,9 @@ readonly class CommandDto
         public TeamDto $team,
         public ChannelDto $channel,
         public UserDto $user,
-        public CommandList $command,
         public string $text,
         public string $apiAppId,
-        public string $triggerId
+        public string $triggerId,
+        public ?CommandList $command = null
     ) {}
 }

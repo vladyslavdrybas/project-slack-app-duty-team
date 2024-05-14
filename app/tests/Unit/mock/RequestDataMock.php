@@ -44,4 +44,9 @@ class RequestDataMock
     {
         return $this->getData($this->slackDataPath, 'command*skills*add.json', CommandList::SkillsAdd->value);
     }
+
+    public function getUnknownCommand(): array
+    {
+        return $this->getData($this->slackDataPath, 'command*not*exist.json', 'not-exist');
+    }
 }

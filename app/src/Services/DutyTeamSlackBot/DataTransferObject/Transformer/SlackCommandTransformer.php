@@ -21,10 +21,10 @@ class SlackCommandTransformer
             new TeamDto($input->teamId, $input->teamDomain),
             new ChannelDto($input->channelId, $input->channelName),
             new UserDto($input->userId, $input->userName),
-            $command,
             $input->text,
             $input->apiAppId,
-            $input->triggerId
+            $input->triggerId,
+            $command
         );
     }
 }

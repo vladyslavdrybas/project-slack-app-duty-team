@@ -33,7 +33,7 @@ class TestMessageSendNotifierCommand extends Command
 
         $io->info('Project environment:' . $this->parameterBag->get('kernel.environment'));
 
-        $botApiToken = $this->parameterBag->get('slack_bot_api_token');
+        $botApiToken = $this->parameterBag->get('duty_team_slack_bot_api_token');
         $channelName = 'D073JLYEMQQ';
         $text = 'thank you for your request. chatter. id: ' . bin2hex(random_bytes(3));
 
