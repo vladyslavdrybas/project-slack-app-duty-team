@@ -5,6 +5,7 @@ namespace App\Tests\Services\DutyTeamSlackBot\Stream;
 
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\TeamDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
@@ -13,12 +14,18 @@ use App\Tests\UnitTestCase;
 
 class InputProcessorTest extends UnitTestCase
 {
-    public function testReceiveCommandCheckInputDto(): void
+    protected function getCommandDto(): CommandDto
     {
         $addSkillsCommandData = $this->requestData()->getAddSkillsCommand();
         $dto = $this->serializer()->denormalize($addSkillsCommandData, SlackCommandInputDto::class);
         $transformer = new SlackCommandTransformer();
-        $dto = $transformer->transform($dto);
+
+        return $transformer->transform($dto);
+    }
+
+    public function testReceiveCommandCheckInputDto(): void
+    {
+        $dto = $this->getCommandDto();
 
         $this->assertObjectHasProperty('token', $dto);
         $this->assertObjectHasProperty('team', $dto);
