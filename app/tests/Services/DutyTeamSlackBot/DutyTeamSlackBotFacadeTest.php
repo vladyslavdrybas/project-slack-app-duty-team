@@ -5,15 +5,19 @@ namespace App\Tests\Services\DutyTeamSlackBot;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DutyTeamSlackBotFacade extends KernelTestCase
+class DutyTeamSlackBotFacadeTest extends KernelTestCase
 {
     public function testReceiveMessage(): void
     {
-
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 
     public function testReceiveCommand(): void
     {
-
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 }
