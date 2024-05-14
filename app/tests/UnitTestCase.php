@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use App\Tests\mock\ConfigMock;
-use App\Tests\mock\RequestDataMock;
-use App\Tests\mock\ServiceMockPool;
+use App\Tests\Unit\mock\ConfigMock;
+use App\Tests\Unit\mock\RequestDataMock;
+use App\Tests\Unit\mock\ServiceMockPool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 

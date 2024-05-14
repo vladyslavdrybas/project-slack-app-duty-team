@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Tests\Services\DutyTeamSlackBot;
+namespace App\Tests\Unit\Services\DutyTeamSlackBot;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 

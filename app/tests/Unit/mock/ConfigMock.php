@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Tests\mock;
+namespace App\Tests\Unit\mock;
 
 class ConfigMock
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Tests\mock;
+namespace App\Tests\Unit\mock;
 
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use Symfony\Component\Finder\Finder;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Tests\Services\DutyTeamSlackBot\Stream;
+namespace App\Tests\Unit\Services\DutyTeamSlackBot\Stream;
 
 use App\Tests\UnitTestCase;
 
