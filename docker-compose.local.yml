@@ -1,7 +1,43 @@
 services:
+  php:
+    networks:
+      - default
+      - database_network
+      - test_database_network
   database:
     ports:
       - "${DATABASE_PUBLIC_PORT}:5432"
   web:
     ports:
       - "${LOCALHOST_PUBLIC_PORT}:80"
+  
+  test-database:
+    container_name: ${PROJECT_NAME:-solo}-${SERVICE_NAME:-service}-test-db-${APP_ENV:-none}
+    image: vd_postgres_base:1.0
+    build:
+      args:
+        APP_ENV: ${APP_ENV}
+    env_file:
+      - .env
+    ports:
+      - "${TEST_DATABASE_PUBLIC_PORT}:5432"
+    networks:
+      default:
+        aliases:
+          - test-database
+      test_database_network:
+        aliases:
+          - "${TEST_DATABASE_ALIAS}"
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - test_database_data:/var/lib/postgresql/data:rw
+
+volumes:
+  test_database_data:
+    name: ${PROJECT_NAME}_${SERVICE_NAME}_database_data_test
+
+networks:
+  test_database_network:
+    name: ${TEST_DATABASE_NETWORK}
+    external: true

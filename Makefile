@@ -15,6 +15,7 @@ app-run-local:
 	make echo-env
 	docker network ls|grep ${PROXY_NETWORK} > /dev/null || docker network create ${PROXY_NETWORK}
 	docker network ls|grep ${DATABASE_NETWORK} > /dev/null || docker network create ${DATABASE_NETWORK}
+	docker network ls|grep ${TEST_DATABASE_NETWORK} > /dev/null || docker network create ${TEST_DATABASE_NETWORK}
 	docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --remove-orphans
 app-check-config-local:
 	make echo-env
