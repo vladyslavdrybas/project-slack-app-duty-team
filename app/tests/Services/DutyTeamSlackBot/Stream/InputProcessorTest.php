@@ -13,7 +13,7 @@ use App\Tests\UnitTestCase;
 
 class InputProcessorTest extends UnitTestCase
 {
-    public function testReceiveCommandValidateInputDto(): void
+    public function testReceiveCommandCheckInputDto(): void
     {
         $addSkillsCommandData = $this->requestData()->getAddSkillsCommand();
         $dto = $this->serializer()->denormalize($addSkillsCommandData, SlackCommandInputDto::class);
@@ -36,6 +36,48 @@ class InputProcessorTest extends UnitTestCase
         $this->assertInstanceOf(ChannelDto::class, $dto->channel);
         $this->assertInstanceOf(UserDto::class, $dto->user);
         $this->assertInstanceOf(CommandList::class, $dto->command);
+    }
+
+    public function testReceiveCommandDetectCommandType(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandValidateCommandData(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandConvertText(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandFindOrCreateTeam(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandFindOrCreateChannel(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
+    public function testReceiveCommandFindOrCreateUser(): void
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 
     public function testSuccessReceiveMessage(): void
