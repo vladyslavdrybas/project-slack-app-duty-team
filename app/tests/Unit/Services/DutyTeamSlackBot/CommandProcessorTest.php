@@ -115,6 +115,31 @@ class CommandProcessorTest extends UnitTestCase
         $commandProcessor->process($dto);
     }
 
+    public function testProcessCommandThrowInvalidCommandException(): void
+    {
+        $this->expectExceptionMessage('Invalid command.');
+
+        $commandProcessor = $this->mockCommandProcessor();
+
+        $slackDto = new SlackCommandInputDto(
+            $this->mockParameterBag()->get('duty_team_slack_bot_verification_token'),
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '/not-exist-cmd',
+            '',
+            $this->mockParameterBag()->get('duty_team_slack_bot_app_id'),
+            ''
+        );
+        $transformer = new SlackCommandTransformer();
+        $dto = $transformer->transform($slackDto);
+
+        $commandProcessor->process($dto);
+    }
+
     public function testReceiveCommandProcessor(): void
     {
         $commandDto = $this->getAddSkillsCommandDto();
@@ -160,7 +185,13 @@ class CommandProcessorTest extends UnitTestCase
             $entityManager
         );
 
-        $commandProcessor->process($commandDto);
+        $slackCommand = $commandProcessor->process($commandDto);
+
+        $this->assertEquals(['php','javascript','docker','redis'], $slackCommand->getData());
+        $this->assertEquals($slackUser, $slackCommand->getUser());
+        $this->assertEquals($slackTeam, $slackCommand->getTeam());
+        $this->assertEquals($slackChannel, $slackCommand->getChannel());
+        $this->assertEquals(CommandList::SkillsAdd, $slackCommand->getCommandName());
     }
 
     protected function getAddSkillsCommandDto(): CommandDto

@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\SlackUserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Entity(repositoryClass: SlackUserRepository::class, readOnly: false)]
+#[ORM\Table(name: "slack_user")]
 class SlackUser extends AbstractEntity
 {
     #[ORM\Column( name: "user_id", type: Types::STRING, length: 180, unique: true, nullable: false)]

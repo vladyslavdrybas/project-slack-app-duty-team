@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackChannel;
+use App\Entity\SlackCommand;
 use App\Entity\SlackTeam;
 use App\Entity\SlackUser;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
@@ -19,7 +20,7 @@ class CommandProcessor
     ) {
     }
 
-    public function process(CommandDto $commandDto): void
+    public function process(CommandDto $commandDto): SlackCommand
     {
         $this->validate($commandDto);
 
@@ -28,25 +29,29 @@ class CommandProcessor
             $slackUser = $this->createSlackUser($commandDto);
         }
 
-        dump($slackUser);
-
         $slackTeam = $this->getSlackTeam($commandDto);
         if (null === $slackUser) {
             $slackTeam = $this->createSlackTeam($commandDto);
         }
-
-        dump($slackTeam);
 
         $slackChannel = $this->getSlackChannel($commandDto);
         if (null === $slackUser) {
             $slackChannel = $this->createSlackChannel($commandDto);
         }
 
-        dump($slackChannel);
+        $slackCommand = new SlackCommand();
+        $slackCommand->setTeam($slackTeam);
+        $slackCommand->setChannel($slackChannel);
+        $slackCommand->setUser($slackUser);
+        $slackCommand->setCommandName($commandDto->command);
 
-        match ($commandDto->command) {
-            CommandList::SkillsAdd => $this->processAddSkills($commandDto),
+        $data = match ($commandDto->command) {
+            CommandList::SkillsAdd => $this->generateAddSkillsData($commandDto->text),
         };
+
+        $slackCommand->setData($data);
+
+        return $slackCommand;
     }
 
     protected function validate(CommandDto $commandDto): void
@@ -57,6 +62,10 @@ class CommandProcessor
 
         if ($commandDto->apiAppId !== $this->parameterBag->get('duty_team_slack_bot_app_id')) {
             throw new \Exception("Invalid app id.");
+        }
+
+        if (null === $commandDto->command) {
+            throw new \Exception("Invalid command.");
         }
     }
 
@@ -111,8 +120,27 @@ class CommandProcessor
         return $slackChannel;
     }
 
-    protected function processAddSkills(CommandDto $commandDto): void
+    protected function cleanText(string $text): string
     {
+        $text = htmlspecialchars($text);
+        $text = htmlentities($text);
+        $text = stripslashes($text);
 
+        return $text;
+    }
+
+    protected function generateAddSkillsData(string $text): array
+    {
+        $text = $this->cleanText($text);
+
+        $data = explode(';', $text);
+        $data = array_filter($data, function($item) { return !empty($item); });
+        $data = array_map(function($item) { return trim($item); }, $data);
+
+        if (count($data) < 1) {
+            return [];
+        }
+
+        return $data;
     }
 }
