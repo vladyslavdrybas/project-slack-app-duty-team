@@ -10,13 +10,15 @@ use App\Entity\SlackUser;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class CommandProcessor
 {
     public function __construct(
         protected readonly ParameterBagInterface $parameterBag,
-        protected readonly EntityManagerInterface $entityManager
+        protected readonly EntityManagerInterface $entityManager,
+        protected readonly LoggerInterface $slackInputLogger
     ) {
     }
 
@@ -28,16 +30,19 @@ class CommandProcessor
         if (null === $slackUser) {
             $slackUser = $this->createSlackUser($commandDto);
         }
+        $this->slackInputLogger->debug(__METHOD__,[$slackUser]);
 
         $slackTeam = $this->getSlackTeam($commandDto);
-        if (null === $slackUser) {
+        if (null === $slackTeam) {
             $slackTeam = $this->createSlackTeam($commandDto);
         }
+        $this->slackInputLogger->debug(__METHOD__,[$slackTeam]);
 
         $slackChannel = $this->getSlackChannel($commandDto);
-        if (null === $slackUser) {
+        if (null === $slackChannel) {
             $slackChannel = $this->createSlackChannel($commandDto);
         }
+        $this->slackInputLogger->debug(__METHOD__,[$slackChannel]);
 
         $slackCommand = new SlackCommand();
         $slackCommand->setTeam($slackTeam);
@@ -49,7 +54,14 @@ class CommandProcessor
             CommandList::SkillsAdd => $this->generateAddSkillsData($commandDto->text),
         };
 
+        if (empty($data)) {
+            throw new \Exception('Invalid data.');
+        }
+
         $slackCommand->setData($data);
+
+        $this->entityManager->persist($slackCommand);
+        $this->entityManager->flush();
 
         return $slackCommand;
     }
