@@ -55,6 +55,8 @@ class SlackBotController extends AbstractController
             throw $e;
         }
 
-        return new Response('Skills add processing...', Response::HTTP_OK);
+        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $slackCommand->getData()));
+
+        return new Response('Added skills: ' . $answer, Response::HTTP_OK);
     }
 }
