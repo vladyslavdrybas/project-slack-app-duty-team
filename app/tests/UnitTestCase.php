@@ -7,6 +7,7 @@ use App\Tests\Unit\mock\ConfigMock;
 use App\Tests\Unit\mock\RequestDataMock;
 use App\Tests\Unit\mock\ServiceMockPool;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -15,6 +16,10 @@ class UnitTestCase extends TestCase
     protected function serializer(): SerializerInterface
     {
         return ServiceMockPool::serializer();
+    }
+    protected function logger(): LoggerInterface
+    {
+        return ServiceMockPool::logger();
     }
 
     protected function requestData(): RequestDataMock

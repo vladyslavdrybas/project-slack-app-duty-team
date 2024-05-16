@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\mock;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
@@ -21,6 +22,8 @@ class ServiceMockPool
     public const SERVICE_SERIALIZER = 'serializer';
     public const SERVICE_REQUEST_DATA = 'requestData';
     public const SERVICE_CONFIG_MOCK = 'configMock';
+    public const SERVICE_LOGGER_MOCK = 'loggerMock';
+
     protected function __construct() { }
 
     public static function serializer(): SerializerInterface
@@ -40,6 +43,15 @@ class ServiceMockPool
         }
 
         return self::$instances[self::SERVICE_SERIALIZER];
+    }
+
+    public static function logger(): LoggerInterface
+    {
+        if (!isset(self::$instances[self::SERVICE_LOGGER_MOCK])) {
+            self::$instances[self::SERVICE_LOGGER_MOCK] = new LoggerMock();
+        }
+
+        return self::$instances[self::SERVICE_LOGGER_MOCK];
     }
 
     public static function requestData(): RequestDataMock

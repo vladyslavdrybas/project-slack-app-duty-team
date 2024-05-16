@@ -182,7 +182,8 @@ class CommandProcessorTest extends UnitTestCase
 
         $commandProcessor = new CommandProcessor(
             $this->mockParameterBag(),
-            $entityManager
+            $entityManager,
+            $this->logger()
         );
 
         $slackCommand = $commandProcessor->process($commandDto);
@@ -207,7 +208,8 @@ class CommandProcessorTest extends UnitTestCase
     {
         return new CommandProcessor(
             $this->mockParameterBag(),
-            $this->createMock(EntityManagerInterface::class)
+            $this->createMock(EntityManagerInterface::class),
+            $this->logger()
         );
     }
 }

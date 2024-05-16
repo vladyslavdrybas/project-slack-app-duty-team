@@ -148,6 +148,7 @@ class CommandProcessor
         $data = explode(';', $text);
         $data = array_filter($data, function($item) { return !empty($item); });
         $data = array_map(function($item) { return trim($item); }, $data);
+        $data = array_unique($data);
 
         if (count($data) < 1) {
             return [];
