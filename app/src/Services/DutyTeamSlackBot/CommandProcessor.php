@@ -51,7 +51,8 @@ class CommandProcessor
         $slackCommand->setCommandName($commandDto->command);
 
         $data = match ($commandDto->command) {
-            CommandList::SkillsAdd => $this->generateAddSkillsData($commandDto->text),
+            CommandList::SkillsAdd => $this->generateSkillsData($commandDto->text),
+            CommandList::SkillsRemove => $this->generateSkillsData($commandDto->text),
         };
 
         if (empty($data)) {
@@ -141,7 +142,7 @@ class CommandProcessor
         return $text;
     }
 
-    protected function generateAddSkillsData(string $text): array
+    protected function generateSkillsData(string $text): array
     {
         $text = $this->cleanText($text);
 

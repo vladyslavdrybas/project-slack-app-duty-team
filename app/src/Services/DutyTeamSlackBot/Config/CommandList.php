@@ -6,5 +6,6 @@ namespace App\Services\DutyTeamSlackBot\Config;
 enum CommandList: string
 {
     case SkillsAdd = 'skills-add';
+    case SkillsRemove = 'skills-remove';
 
 }
