@@ -25,11 +25,20 @@ class SkillsCommandProcessor
         return match ($command->getCommandName()) {
             CommandList::SkillsAdd => $this->add($command),
             CommandList::SkillsRemove => $this->remove($command),
+            CommandList::SkillsShow => $this->show($command),
             default => throw new \Exception('Skills command not defined.'),
         };
     }
 
-    public function add(SlackCommand $command): BotResponseDto
+    protected function answerAllSkills(array $skills): BotResponseDto
+    {
+        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $skills));
+        $answer = 'Skills: ' . $answer;
+
+        return new BotResponseDto($answer);
+    }
+
+    protected function add(SlackCommand $command): BotResponseDto
     {
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
@@ -59,13 +68,10 @@ class SkillsCommandProcessor
 
         $this->slackInputLogger->debug('userSkills', [$skills]);
 
-        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $userSkills->getSkills()));
-        $answer = 'Skills: ' . $answer;
-
-        return new BotResponseDto($answer);
+        return $this->answerAllSkills($userSkills->getSkills());
     }
 
-    public function remove(SlackCommand $command): BotResponseDto
+    protected function remove(SlackCommand $command): BotResponseDto
     {
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
@@ -95,9 +101,20 @@ class SkillsCommandProcessor
 
         $this->slackInputLogger->debug('userSkills', [$skills]);
 
-        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $userSkills->getSkills()));
-        $answer = 'Skills: ' . $answer;
+        return $this->answerAllSkills($userSkills->getSkills());
+    }
 
-        return new BotResponseDto($answer);
+    protected function show(SlackCommand $command): BotResponseDto
+    {
+        $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
+            'slackUser' => $command->getUser(),
+        ]);
+
+        $skills = [];
+        if (null !== $userSkills) {
+            $skills = $userSkills->getSkills();
+        }
+
+        return $this->answerAllSkills($skills);
     }
 }
