@@ -5,11 +5,13 @@ namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
 use App\Entity\UserSkills;
+use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Command\BotResponseDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class SkillsAddProcessor
+class SkillsCommandProcessor
 {
     public function __construct(
         protected readonly ParameterBagInterface $parameterBag,
@@ -18,7 +20,16 @@ class SkillsAddProcessor
     ) {
     }
 
-    public function add(SlackCommand $command): UserSkills
+    public function process(SlackCommand $command): BotResponseDto
+    {
+        return match ($command->getCommandName()) {
+            CommandList::SkillsAdd => $this->add($command),
+            CommandList::SkillsRemove => $this->remove($command),
+            default => throw new \Exception('Skills command not defined.'),
+        };
+    }
+
+    public function add(SlackCommand $command): BotResponseDto
     {
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
@@ -46,10 +57,15 @@ class SkillsAddProcessor
             $this->entityManager->flush();
         }
 
-        return $userSkills;
+        $this->slackInputLogger->debug('userSkills', [$skills]);
+
+        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $userSkills->getSkills()));
+        $answer = 'Skills: ' . $answer;
+
+        return new BotResponseDto($answer);
     }
 
-    public function remove(SlackCommand $command): UserSkills
+    public function remove(SlackCommand $command): BotResponseDto
     {
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
@@ -77,6 +93,11 @@ class SkillsAddProcessor
             $this->entityManager->flush();
         }
 
-        return $userSkills;
+        $this->slackInputLogger->debug('userSkills', [$skills]);
+
+        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $userSkills->getSkills()));
+        $answer = 'Skills: ' . $answer;
+
+        return new BotResponseDto($answer);
     }
 }

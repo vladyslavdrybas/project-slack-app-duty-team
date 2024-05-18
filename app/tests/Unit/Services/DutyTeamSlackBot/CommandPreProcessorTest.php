@@ -9,7 +9,7 @@ use App\Entity\SlackUser;
 use App\Repository\SlackChannelRepository;
 use App\Repository\SlackTeamRepository;
 use App\Repository\SlackUserRepository;
-use App\Services\DutyTeamSlackBot\CommandProcessor;
+use App\Services\DutyTeamSlackBot\CommandPreProcessor;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
@@ -20,7 +20,7 @@ use App\Services\DutyTeamSlackBot\DataTransferObject\UserDto;
 use App\Tests\UnitTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
-class CommandProcessorTest extends UnitTestCase
+class CommandPreProcessorTest extends UnitTestCase
 {
     public function testReceiveCommandCheckInputDto(): void
     {
@@ -180,7 +180,7 @@ class CommandProcessorTest extends UnitTestCase
                 [SlackChannel::class, $slackChannelRepository],
             ]);
 
-        $commandProcessor = new CommandProcessor(
+        $commandProcessor = new CommandPreProcessor(
             $this->mockParameterBag(),
             $entityManager,
             $this->logger()
@@ -204,9 +204,9 @@ class CommandProcessorTest extends UnitTestCase
         return $transformer->transform($dto);
     }
 
-    protected function mockCommandProcessor(): CommandProcessor
+    protected function mockCommandProcessor(): CommandPreProcessor
     {
-        return new CommandProcessor(
+        return new CommandPreProcessor(
             $this->mockParameterBag(),
             $this->createMock(EntityManagerInterface::class),
             $this->logger()

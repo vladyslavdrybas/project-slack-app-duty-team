@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use App\Services\DutyTeamSlackBot\CommandProcessor;
+use App\Services\DutyTeamSlackBot\CommandPreProcessor;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
-use App\Services\DutyTeamSlackBot\SkillsAddProcessor;
+use App\Services\DutyTeamSlackBot\CommandProcessor;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[WithMonologChannel('slack_input')]
@@ -30,14 +29,13 @@ class SlackBotController extends AbstractController
         ]);
     }
 
-    #[Route('/skills/add', name: '_command_skills_add', methods: ["POST", "PUT"])]
-    public function skillsAdd(
-        Request $request,
-//        #[MapRequestPayload] SlackCommandInputDto $slackCommandInputDto,
+    #[Route('/command', name: '_command', methods: ["POST", "PUT"])]
+    public function command(
+        Request                 $request,
         SlackCommandTransformer $transformer,
-        CommandProcessor $commandProcessor,
-        SkillsAddProcessor $skillsAddProcessor,
-        LoggerInterface $slackInputLogger
+        CommandPreProcessor     $commandPreProcessor,
+        CommandProcessor        $commandProcessor,
+        LoggerInterface         $slackInputLogger
     ): Response {
         try {
             $payload =  $request->getPayload()->all();
@@ -49,54 +47,16 @@ class SlackBotController extends AbstractController
             $dto = $transformer->transform($slackCommandInputDto);
             $slackInputLogger->debug('slack command dto', [$dto]);
 
-            $slackCommand = $commandProcessor->process($dto);
+            $slackCommand = $commandPreProcessor->process($dto);
             $slackInputLogger->debug('slack command', [$slackCommand]);
 
-            $skills = $skillsAddProcessor->add($slackCommand);
-            $slackInputLogger->debug('userSkills', [$skills]);
+            $answer = $commandProcessor->process($slackCommand);
         } catch (\Exception $e) {
             $slackInputLogger->error($e->getMessage());
 
             throw $e;
         }
 
-        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $slackCommand->getData()));
-
-        return new Response('Added skills: ' . $answer, Response::HTTP_OK);
-    }
-
-    #[Route('/skills/remove', name: '_command_skills_remove', methods: ["POST", "PUT"])]
-    public function skillsRemove(
-        Request $request,
-//        #[MapRequestPayload] SlackCommandInputDto $slackCommandInputDto,
-        SlackCommandTransformer $transformer,
-        CommandProcessor $commandProcessor,
-        SkillsAddProcessor $skillsAddProcessor,
-        LoggerInterface $slackInputLogger
-    ): Response {
-        try {
-            $payload =  $request->getPayload()->all();
-            $slackInputLogger->debug('slack request',[$request->getPathInfo(), $request->getPayload()->all()]);
-
-            $slackCommandInputDto = $this->serializer->denormalize($payload, SlackCommandInputDto::class);
-            $slackInputLogger->debug('slack command input dto', [$slackCommandInputDto]);
-
-            $dto = $transformer->transform($slackCommandInputDto);
-            $slackInputLogger->debug('slack command dto', [$dto]);
-
-            $slackCommand = $commandProcessor->process($dto);
-            $slackInputLogger->debug('slack command', [$slackCommand]);
-
-            $skills = $skillsAddProcessor->remove($slackCommand);
-            $slackInputLogger->debug('userSkills', [$skills]);
-        } catch (\Exception $e) {
-            $slackInputLogger->error($e->getMessage());
-
-            throw $e;
-        }
-
-        $answer = implode(' ', array_map(function ($item) {return '`' . $item . '`';}, $slackCommand->getData()));
-
-        return new Response('Removed skills: ' . $answer, Response::HTTP_OK);
+        return new Response($answer->text, $answer->code);
     }
 }

@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class CommandProcessor
+class CommandPreProcessor
 {
     public function __construct(
         protected readonly ParameterBagInterface $parameterBag,
@@ -51,8 +51,8 @@ class CommandProcessor
         $slackCommand->setCommandName($commandDto->command);
 
         $data = match ($commandDto->command) {
-            CommandList::SkillsAdd => $this->generateSkillsData($commandDto->text),
-            CommandList::SkillsRemove => $this->generateSkillsData($commandDto->text),
+            CommandList::SkillsAdd, CommandList::SkillsRemove => $this->generateSkillsData($commandDto->text),
+            default => [],
         };
 
         if (empty($data)) {
