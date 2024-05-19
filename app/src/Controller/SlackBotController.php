@@ -22,7 +22,7 @@ class SlackBotController extends AbstractController
         Request $request,
         LoggerInterface $slackInputLogger
     ): JsonResponse {
-        $slackInputLogger->info('slack message request',[$request->getPathInfo(), $request->getPayload()->all()]);
+        $slackInputLogger->debug('slack message request',[$request->getPathInfo(), $request->getPayload()->all()]);
 
         return $this->json([
             'challenge' => $request->getPayload()->get('challenge')
@@ -59,5 +59,38 @@ class SlackBotController extends AbstractController
         }
 
         return new Response($answer->text, $answer->code);
+    }
+
+    #[Route('/interactivity', name: '_interactivity', methods: ["POST", "PUT"])]
+    public function interactivity(
+        Request                 $request,
+        SlackCommandTransformer $transformer,
+        CommandPreProcessor     $commandPreProcessor,
+        CommandProcessor        $commandProcessor,
+        LoggerInterface         $slackInputLogger
+    ): Response {
+        try {
+            $payload =  $request->getPayload()->all();
+            $slackInputLogger->debug('slack interactivity request',[$request->getPathInfo(), $request->getPayload()->all()]);
+            $slackInputLogger->debug('slack interactivity payload',[json_decode($request->getPayload()->get('payload'), true)]);
+
+//            $slackCommandInputDto = $this->serializer->denormalize($payload, SlackCommandInputDto::class);
+//            $slackInputLogger->debug('slack command input dto', [$slackCommandInputDto]);
+//
+//            $dto = $transformer->transform($slackCommandInputDto);
+//            $slackInputLogger->debug('slack command dto', [$dto]);
+//
+//            $slackCommand = $commandPreProcessor->process($dto);
+//            $slackInputLogger->debug('slack command', [$slackCommand]);
+//
+//            $answer = $commandProcessor->process($slackCommand);
+//            $slackInputLogger->debug('slack command answer', [$answer->text]);
+        } catch (\Exception $e) {
+            $slackInputLogger->error($e->getMessage());
+
+            throw $e;
+        }
+
+        return new Response('$answer->text', 200);
     }
 }

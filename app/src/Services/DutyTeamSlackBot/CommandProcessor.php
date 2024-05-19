@@ -10,6 +10,7 @@ class CommandProcessor
 {
     public function __construct(
         protected readonly SkillsCommandProcessor $skillsCommandProcessor,
+        protected readonly TimeOffCommandProcessor $timeOffCommandProcessor,
     ) {
     }
 
@@ -17,6 +18,7 @@ class CommandProcessor
     {
         return match (true) {
             $command->getCommandName()->isSkillsCommand() => $this->skillsCommandProcessor->process($command),
+            $command->getCommandName()->isTimeOffCommand() => $this->timeOffCommandProcessor->process($command),
             default => throw new \Exception('Undefined slack command stack.'),
         };
     }
