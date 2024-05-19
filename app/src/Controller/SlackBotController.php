@@ -22,7 +22,7 @@ class SlackBotController extends AbstractController
         Request $request,
         LoggerInterface $slackInputLogger
     ): JsonResponse {
-        $slackInputLogger->info('slack request',[$request->getPathInfo(), $request->getPayload()->all()]);
+        $slackInputLogger->info('slack message request',[$request->getPathInfo(), $request->getPayload()->all()]);
 
         return $this->json([
             'challenge' => $request->getPayload()->get('challenge')
@@ -39,7 +39,7 @@ class SlackBotController extends AbstractController
     ): Response {
         try {
             $payload =  $request->getPayload()->all();
-            $slackInputLogger->debug('slack request',[$request->getPathInfo(), $request->getPayload()->all()]);
+            $slackInputLogger->debug('slack command request',[$request->getPathInfo(), $request->getPayload()->all()]);
 
             $slackCommandInputDto = $this->serializer->denormalize($payload, SlackCommandInputDto::class);
             $slackInputLogger->debug('slack command input dto', [$slackCommandInputDto]);
@@ -51,6 +51,7 @@ class SlackBotController extends AbstractController
             $slackInputLogger->debug('slack command', [$slackCommand]);
 
             $answer = $commandProcessor->process($slackCommand);
+            $slackInputLogger->debug('slack command answer', [$answer->text]);
         } catch (\Exception $e) {
             $slackInputLogger->error($e->getMessage());
 
