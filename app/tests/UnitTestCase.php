@@ -42,6 +42,7 @@ class UnitTestCase extends TestCase
                 return match ($key) {
                     'duty_team_slack_bot_verification_token' => $this->config()->get('SLACK_VERIFICATION_TOKEN'),
                     'duty_team_slack_bot_app_id' => $this->config()->get('SLACK_APP_ID'),
+                    'duty_team_slack_bot_log_command' => $this->config()->get('SLACK_LOG_COMMAND'),
                 };
             })
         ;

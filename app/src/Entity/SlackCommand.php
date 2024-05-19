@@ -24,8 +24,8 @@ class SlackCommand extends AbstractEntity
     #[ORM\JoinColumn(name:'user_id', referencedColumnName: 'id', nullable: false)]
     protected SlackUser $user;
 
-    #[ORM\Column( name: "data", type: Types::JSON)]
-    protected array $data;
+    #[ORM\Column( name: "text", type: Types::TEXT, nullable: false)]
+    protected string $text;
 
     # month, year
     #[ORM\Column(name: "command_name", type: Types::STRING, length: 237, enumType: CommandList::class)]
@@ -61,14 +61,14 @@ class SlackCommand extends AbstractEntity
         $this->user = $user;
     }
 
-    public function getData(): array
+    public function getText(): string
     {
-        return $this->data;
+        return $this->text;
     }
 
-    public function setData(array $data): void
+    public function setText(string $text): void
     {
-        $this->data = $data;
+        $this->text = $text;
     }
 
     public function getCommandName(): CommandList

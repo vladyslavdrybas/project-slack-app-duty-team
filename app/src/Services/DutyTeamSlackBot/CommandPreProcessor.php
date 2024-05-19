@@ -7,7 +7,6 @@ use App\Entity\SlackChannel;
 use App\Entity\SlackCommand;
 use App\Entity\SlackTeam;
 use App\Entity\SlackUser;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -49,20 +48,12 @@ class CommandPreProcessor
         $slackCommand->setChannel($slackChannel);
         $slackCommand->setUser($slackUser);
         $slackCommand->setCommandName($commandDto->command);
+        $slackCommand->setText($this->cleanText($commandDto->text));
 
-        $data = match ($commandDto->command) {
-            CommandList::SkillsAdd, CommandList::SkillsRemove => $this->generateSkillsData($commandDto->text),
-            default => [],
-        };
-
-        if (empty($data)) {
-            throw new \Exception('Invalid data.');
+        if (filter_var($this->parameterBag->get('duty_team_slack_bot_log_command'), FILTER_VALIDATE_BOOLEAN)) {
+            $this->entityManager->persist($slackCommand);
+            $this->entityManager->flush();
         }
-
-        $slackCommand->setData($data);
-
-        $this->entityManager->persist($slackCommand);
-        $this->entityManager->flush();
 
         return $slackCommand;
     }
@@ -140,21 +131,5 @@ class CommandPreProcessor
         $text = stripslashes($text);
 
         return $text;
-    }
-
-    protected function generateSkillsData(string $text): array
-    {
-        $text = $this->cleanText($text);
-
-        $data = explode(';', $text);
-        $data = array_filter($data, function($item) { return !empty($item); });
-        $data = array_map(function($item) { return trim($item); }, $data);
-        $data = array_unique($data);
-
-        if (count($data) < 1) {
-            return [];
-        }
-
-        return $data;
     }
 }

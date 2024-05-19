@@ -38,6 +38,20 @@ class SkillsCommandProcessor
         return new BotResponseDto($answer);
     }
 
+    protected function mineDataFromCommand(string $text): array
+    {
+        $data = explode(';', $text);
+        $data = array_filter($data, function($item) { return !empty($item); });
+        $data = array_map(function($item) { return trim($item); }, $data);
+        $data = array_unique($data);
+
+        if (count($data) < 1) {
+            return [];
+        }
+
+        return $data;
+    }
+
     protected function add(SlackCommand $command): BotResponseDto
     {
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
@@ -54,7 +68,7 @@ class SkillsCommandProcessor
             array_unique(
                 array_merge(
                     $userSkills->getSkills(),
-                    $command->getData()
+                    $this->mineDataFromCommand($command->getText())
                 )
             )
         );
@@ -87,7 +101,7 @@ class SkillsCommandProcessor
             array_unique(
                 array_diff(
                     $userSkills->getSkills(),
-                    $command->getData()
+                    $this->mineDataFromCommand($command->getText())
                 )
             )
         );

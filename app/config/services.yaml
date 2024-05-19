@@ -10,7 +10,8 @@ parameters:
   duty_team_slack_bot_api_token: '%env(SLACK_BOT_API_TOKEN)%'
   duty_team_slack_bot_app_id: '%env(SLACK_APP_ID)%'
   duty_team_slack_bot_verification_token: '%env(SLACK_VERIFICATION_TOKEN)%'
-
+  duty_team_slack_bot_log_command: '%env(bool:SLACK_LOG_COMMAND)%'
+  
 services:
     # default configuration for services in *this* file
     _defaults:

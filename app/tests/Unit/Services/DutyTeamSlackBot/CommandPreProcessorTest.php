@@ -188,7 +188,7 @@ class CommandPreProcessorTest extends UnitTestCase
 
         $slackCommand = $commandProcessor->process($commandDto);
 
-        $this->assertEquals(['php','javascript','docker','redis'], $slackCommand->getData());
+        $this->assertEquals($commandDto->text, $slackCommand->getText());
         $this->assertEquals($slackUser, $slackCommand->getUser());
         $this->assertEquals($slackTeam, $slackCommand->getTeam());
         $this->assertEquals($slackChannel, $slackCommand->getChannel());
