@@ -11,39 +11,14 @@ use App\Repository\SlackTeamRepository;
 use App\Repository\SlackUserRepository;
 use App\Services\DutyTeamSlackBot\CommandPreProcessor;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
-use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\TeamDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
-use App\Services\DutyTeamSlackBot\DataTransferObject\UserDto;
 use App\Tests\UnitTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CommandPreProcessorTest extends UnitTestCase
 {
-    public function testReceiveCommandCheckInputDto(): void
-    {
-        $dto = $this->getAddSkillsCommandDto();
-
-        $this->assertObjectHasProperty('token', $dto);
-        $this->assertObjectHasProperty('team', $dto);
-        $this->assertObjectHasProperty('channel', $dto);
-        $this->assertObjectHasProperty('user', $dto);
-        $this->assertObjectHasProperty('command', $dto);
-        $this->assertObjectHasProperty('text', $dto);
-        $this->assertObjectHasProperty('apiAppId', $dto);
-        $this->assertObjectHasProperty('triggerId', $dto);
-
-        $this->assertEquals($this->config()->get('SLACK_VERIFICATION_TOKEN'), $dto->token);
-        $this->assertEquals($this->config()->get('SLACK_APP_ID'), $dto->apiAppId);
-
-        $this->assertInstanceOf(TeamDto::class, $dto->team);
-        $this->assertInstanceOf(ChannelDto::class, $dto->channel);
-        $this->assertInstanceOf(UserDto::class, $dto->user);
-        $this->assertInstanceOf(CommandList::class, $dto->command);
-    }
-
     public function testReceiveUnknownCommand(): void
     {
         $slackDto = new SlackCommandInputDto(

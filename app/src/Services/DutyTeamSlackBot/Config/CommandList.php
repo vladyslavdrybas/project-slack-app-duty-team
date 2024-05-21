@@ -9,6 +9,7 @@ enum CommandList: string
     case SkillsRemove = 'skills-remove';
     case SkillsShow = 'skills-show';
     case TimeOff = 'timeoff';
+    case TimeOffBtnAdd = 'timeoff-btn-add';
     case TimeOffShow = 'timeoff-show';
 
     public function isSkillsCommand(): bool
@@ -22,7 +23,7 @@ enum CommandList: string
     public function isTimeOffCommand(): bool
     {
         return match ($this) {
-            self::TimeOff, self::TimeOffShow => true,
+            self::TimeOff, self::TimeOffBtnAdd, self::TimeOffShow => true,
             default => false,
         };
     }

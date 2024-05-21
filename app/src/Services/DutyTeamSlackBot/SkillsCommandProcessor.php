@@ -6,7 +6,7 @@ namespace App\Services\DutyTeamSlackBot;
 use App\Entity\SlackCommand;
 use App\Entity\UserSkills;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Command\BotResponseDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

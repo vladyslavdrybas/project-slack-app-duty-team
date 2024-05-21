@@ -3,133 +3,38 @@ declare(strict_types=1);
 
 namespace App\Services\DutyTeamSlackBot;
 
-use App\Entity\SlackChannel;
 use App\Entity\SlackCommand;
-use App\Entity\SlackTeam;
-use App\Entity\SlackUser;
+use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
 
-class CommandPreProcessor
+class CommandPreProcessor extends AbstractPreProcessor
 {
-    public function __construct(
-        protected readonly ParameterBagInterface $parameterBag,
-        protected readonly EntityManagerInterface $entityManager,
-        protected readonly LoggerInterface $slackInputLogger
-    ) {
+    public function process(ISlackMessageIdentifier $dto): SlackCommand
+    {
+        if (!$dto instanceof CommandDto) {
+            throw new \Exception("Invalid DTO.");
+        }
+
+        return parent::process($dto);
     }
 
-    public function process(CommandDto $commandDto): SlackCommand
+    protected function getCommandName(ISlackMessageIdentifier|CommandDto $dto): CommandList
     {
-        $this->validate($commandDto);
-
-        $slackUser = $this->getSlackUser($commandDto);
-        if (null === $slackUser) {
-            $slackUser = $this->createSlackUser($commandDto);
-        }
-        $this->slackInputLogger->debug(__METHOD__,[$slackUser]);
-
-        $slackTeam = $this->getSlackTeam($commandDto);
-        if (null === $slackTeam) {
-            $slackTeam = $this->createSlackTeam($commandDto);
-        }
-        $this->slackInputLogger->debug(__METHOD__,[$slackTeam]);
-
-        $slackChannel = $this->getSlackChannel($commandDto);
-        if (null === $slackChannel) {
-            $slackChannel = $this->createSlackChannel($commandDto);
-        }
-        $this->slackInputLogger->debug(__METHOD__,[$slackChannel]);
-
-        $slackCommand = new SlackCommand();
-        $slackCommand->setTeam($slackTeam);
-        $slackCommand->setChannel($slackChannel);
-        $slackCommand->setUser($slackUser);
-        $slackCommand->setCommandName($commandDto->command);
-        $slackCommand->setText($this->cleanText($commandDto->text));
-
-        if (filter_var($this->parameterBag->get('duty_team_slack_bot_log_command'), FILTER_VALIDATE_BOOLEAN)) {
-            $this->entityManager->persist($slackCommand);
-            $this->entityManager->flush();
-        }
-
-        return $slackCommand;
+        return $dto->command;
     }
 
-    protected function validate(CommandDto $commandDto): void
+    protected function getText(ISlackMessageIdentifier|CommandDto $dto): string
     {
-        if ($commandDto->token !== $this->parameterBag->get('duty_team_slack_bot_verification_token')) {
-            throw new \Exception("Invalid bot token.");
-        }
+        return $this->cleanText($dto->text);
+    }
 
-        if ($commandDto->apiAppId !== $this->parameterBag->get('duty_team_slack_bot_app_id')) {
-            throw new \Exception("Invalid app id.");
-        }
+    protected function validate(ISlackMessageIdentifier|CommandDto $dto): void
+    {
+        parent::validate($dto);
 
-        if (null === $commandDto->command) {
+        if (null === $dto->getCommand()) {
             throw new \Exception("Invalid command.");
         }
-    }
-
-    protected function getSlackUser(CommandDto $commandDto): ?SlackUser
-    {
-        return $this->entityManager->getRepository(SlackUser::class)->findOneBy(['userId' => $commandDto->user->userId]);
-    }
-
-    protected function createSlackUser(CommandDto $commandDto):  ?SlackUser
-    {
-        $slackUser = new SlackUser();
-        $slackUser->setUserId($commandDto->user->userId);
-        $slackUser->setUserName($commandDto->user->userName);
-
-        $this->entityManager->persist($slackUser);
-        $this->entityManager->flush();
-
-        return $slackUser;
-    }
-
-    protected function getSlackTeam(CommandDto $commandDto): ?SlackTeam
-    {
-        return $this->entityManager->getRepository(SlackTeam::class)->findOneBy(['teamId' => $commandDto->team->teamId]);
-    }
-
-    protected function createSlackTeam(CommandDto $commandDto):  ?SlackTeam
-    {
-        $slackTeam = new SlackTeam();
-        $slackTeam->setTeamId($commandDto->team->teamId);
-        $slackTeam->setTeamDomain($commandDto->team->teamDomain);
-
-        $this->entityManager->persist($slackTeam);
-        $this->entityManager->flush();
-
-        return $slackTeam;
-    }
-
-    protected function getSlackChannel(CommandDto $commandDto): ?SlackChannel
-    {
-        return $this->entityManager->getRepository(SlackChannel::class)->findOneBy(['channelId' => $commandDto->channel->channelId]);
-    }
-
-    protected function createSlackChannel(CommandDto $commandDto):  ?SlackChannel
-    {
-        $slackChannel = new SlackChannel();
-        $slackChannel->setChannelId($commandDto->channel->channelId);
-        $slackChannel->setChannelName($commandDto->channel->channelName);
-
-        $this->entityManager->persist($slackChannel);
-        $this->entityManager->flush();
-
-        return $slackChannel;
-    }
-
-    protected function cleanText(string $text): string
-    {
-        $text = htmlspecialchars($text);
-        $text = htmlentities($text);
-        $text = stripslashes($text);
-
-        return $text;
     }
 }

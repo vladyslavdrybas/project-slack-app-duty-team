@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Command\BotResponseDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
 
 class CommandProcessor
 {

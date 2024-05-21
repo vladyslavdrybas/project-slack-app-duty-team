@@ -45,8 +45,8 @@ class RequestDataMock
         return $this->getData($this->slackDataPath, 'command*skills*add.json', CommandList::SkillsAdd->value);
     }
 
-    public function getUnknownCommand(): array
+    public function getInteractivityMessage(): array
     {
-        return $this->getData($this->slackDataPath, 'command*not*exist.json', 'not-exist');
+        return $this->getData($this->slackDataPath, 'interactivity_payload_timeoff_add.json', 'not-exist');
     }
 }

@@ -4,13 +4,20 @@ namespace App\Controller;
 
 use App\Services\DutyTeamSlackBot\CommandPreProcessor;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\SlackInteractivityInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
 use App\Services\DutyTeamSlackBot\CommandProcessor;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackInteractivityTransformer;
+use App\Services\DutyTeamSlackBot\InteractivityPreProcessor;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
+use Symfony\Component\Notifier\Chatter;
+use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[WithMonologChannel('slack_input')]
@@ -64,33 +71,57 @@ class SlackBotController extends AbstractController
     #[Route('/interactivity', name: '_interactivity', methods: ["POST", "PUT"])]
     public function interactivity(
         Request                 $request,
-        SlackCommandTransformer $transformer,
-        CommandPreProcessor     $commandPreProcessor,
+        SlackInteractivityTransformer $transformer,
+        InteractivityPreProcessor     $interactivityPreProcessor,
         CommandProcessor        $commandProcessor,
-        LoggerInterface         $slackInputLogger
+        LoggerInterface         $slackInputLogger,
+        ParameterBagInterface $parameterBag
     ): Response {
         try {
-            $payload =  $request->getPayload()->all();
-            $slackInputLogger->debug('slack interactivity request',[$request->getPathInfo(), $request->getPayload()->all()]);
-            $slackInputLogger->debug('slack interactivity payload',[json_decode($request->getPayload()->get('payload'), true)]);
+            $payload = $request->getPayload()->get('payload');
+            if (null === $payload) {
+                throw new \Exception('Cannot get payload');
+            }
+            $payload = json_decode($payload, true);
 
-//            $slackCommandInputDto = $this->serializer->denormalize($payload, SlackCommandInputDto::class);
-//            $slackInputLogger->debug('slack command input dto', [$slackCommandInputDto]);
-//
-//            $dto = $transformer->transform($slackCommandInputDto);
-//            $slackInputLogger->debug('slack command dto', [$dto]);
-//
-//            $slackCommand = $commandPreProcessor->process($dto);
-//            $slackInputLogger->debug('slack command', [$slackCommand]);
-//
-//            $answer = $commandProcessor->process($slackCommand);
-//            $slackInputLogger->debug('slack command answer', [$answer->text]);
+            $slackInputLogger->debug('slack interactivity request',[$request->getPathInfo(), $request->getPayload()->all()]);
+            $slackInputLogger->debug('slack interactivity payload',[$payload]);
+
+            $slackInputDto = $this->serializer->denormalize($payload, SlackInteractivityInputDto::class);
+            $slackInputLogger->debug('slack interactivity input dto', [$slackInputDto]);
+
+            $dto = $transformer->transform($slackInputDto);
+            $slackInputLogger->debug('slack interactivity dto', [$dto]);
+
+            $slackCommand = $interactivityPreProcessor->process($dto);
+            $slackInputLogger->debug('slack interactivity', [$slackCommand]);
+
+            $answer = $commandProcessor->process($slackCommand);
+            $slackInputLogger->debug('slack interactivity answer', [$answer->text]);
+
+
         } catch (\Exception $e) {
             $slackInputLogger->error($e->getMessage());
+
+            if ('Cannot get action command' === $e->getMessage()) {
+                return new Response('');
+            }
+
+            $botApiToken = $parameterBag->get('duty_team_slack_bot_api_token');
+            $channelId = $slackCommand->getChannel()->getChannelId();
+
+            $slackTransport = new SlackTransport(
+                $botApiToken,
+                $channelId
+            );
+            $chatter = new Chatter($slackTransport);
+
+            $chatMessage = new ChatMessage('`Error`: ' . $e->getMessage());
+            $response = $chatter->send($chatMessage);
 
             throw $e;
         }
 
-        return new Response('$answer->text', 200);
+        return new Response($answer->text, $answer->code);
     }
 }

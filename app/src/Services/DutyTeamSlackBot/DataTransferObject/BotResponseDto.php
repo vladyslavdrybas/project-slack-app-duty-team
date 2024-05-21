@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Services\DutyTeamSlackBot\DataTransferObject\Command;
+namespace App\Services\DutyTeamSlackBot\DataTransferObject;
 
 use Symfony\Component\HttpFoundation\Response;
 
