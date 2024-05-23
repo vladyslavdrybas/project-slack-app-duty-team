@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity;
 
-readonly class ButtonActionElement implements IActionElement
+readonly class ButtonActionElement implements IActionElement, IButtonElement
 {
     public string $type;
     public function __construct(

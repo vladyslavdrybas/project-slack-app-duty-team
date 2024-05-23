@@ -10,11 +10,11 @@
   "token": "UJgP8ayNRekblYLwTfW9swvr",
   "container": {
     "type": "message",
-    "message_ts": "1716159482.833229",
+    "message_ts": "1716462387.966499",
     "channel_id": "D073JLYEMQQ",
     "is_ephemeral": false
   },
-  "trigger_id": "7134460243478.7118265256848.9a2bd5d91bd9584d4300f4db1779722c",
+  "trigger_id": "7185957015744.7118265256848.b36fc536d2764192ea498594e029feaa",
   "team": {
     "id": "T073G7T7JQY",
     "domain": "vladyslavdryb-tdt2059"
@@ -28,99 +28,128 @@
   "message": {
     "user": "U072VPS2VQT",
     "type": "message",
-    "ts": "1716159482.833229",
+    "ts": "1716462387.966499",
     "bot_id": "B072YBM2XNY",
     "app_id": "A072TBG8YEP",
-    "text": "Add Time Off:",
+    "text": "Time Off that you have: `2024-12-22` - `2024-12-31` remove button `2024-12-31` remove button `2024-12-30` remove button `2024-12-23` - `2024-12-31` remove button",
     "team": "T073G7T7JQY",
     "blocks": [
       {
-        "type": "actions",
-        "block_id": "Eyf7G",
-        "elements": [
-          {
-            "type": "datepicker",
-            "action_id": "timeoff-start-date",
-            "initial_date": "2024-12-30",
-            "placeholder": {
-              "type": "plain_text",
-              "text": "Start date",
-              "emoji": true
-            }
+        "type": "divider",
+        "block_id": "C1bld"
+      },
+      {
+        "type": "header",
+        "block_id": "ckfQ5",
+        "text": {
+          "type": "plain_text",
+          "text": "Time Off that you have:",
+          "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "EeqmI",
+        "text": {
+          "type": "mrkdwn",
+          "text": "`2024-12-22` - `2024-12-31`",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "button",
+          "action_id": "timeoff-btn-remove",
+          "style": "danger",
+          "text": {
+            "type": "plain_text",
+            "text": "remove",
+            "emoji": true
           },
-          {
-            "type": "datepicker",
-            "action_id": "timeoff-end-date",
-            "initial_date": "2024-12-30",
-            "placeholder": {
-              "type": "plain_text",
-              "text": "End date",
-              "emoji": true
-            }
-          }
-        ]
+          "value": "018f98ab-c657-79ef-915a-c9a225c75eb5"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "gLdCw",
+        "text": {
+          "type": "mrkdwn",
+          "text": "`2024-12-31`",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "button",
+          "action_id": "timeoff-btn-remove",
+          "style": "danger",
+          "text": {
+            "type": "plain_text",
+            "text": "remove",
+            "emoji": true
+          },
+          "value": "018f98ac-75c1-7ebd-b1ad-924580289247"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "hQ/7x",
+        "text": {
+          "type": "mrkdwn",
+          "text": "`2024-12-30`",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "button",
+          "action_id": "timeoff-btn-remove",
+          "style": "danger",
+          "text": {
+            "type": "plain_text",
+            "text": "remove",
+            "emoji": true
+          },
+          "value": "018fa120-52bf-7537-931d-e57e6498d44a"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "ceeDC",
+        "text": {
+          "type": "mrkdwn",
+          "text": "`2024-12-23` - `2024-12-31`",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "button",
+          "action_id": "timeoff-btn-remove",
+          "style": "danger",
+          "text": {
+            "type": "plain_text",
+            "text": "remove",
+            "emoji": true
+          },
+          "value": "018fa143-80c3-725f-a73e-6fbe0933ad32"
+        }
       },
       {
         "type": "divider",
-        "block_id": "MbSpv"
-      },
-      {
-        "type": "actions",
-        "block_id": "fGziC",
-        "elements": [
-          {
-            "type": "button",
-            "action_id": "timeoff-btn-add",
-            "text": {
-              "type": "plain_text",
-              "text": "Add Time Off",
-              "emoji": true
-            },
-            "value": "timeoff-btn-add"
-          },
-          {
-            "type": "button",
-            "action_id": "timeoff-btn-remove",
-            "text": {
-              "type": "plain_text",
-              "text": "Remove Time Off",
-              "emoji": true
-            },
-            "style": "danger",
-            "value": "timeoff-btn-remove"
-          }
-        ]
+        "block_id": "r5ARu"
       }
     ]
   },
   "state": {
-    "values": {
-      "Eyf7G": {
-        "timeoff-start-date": {
-          "type": "datepicker",
-          "selected_date": "2024-12-17"
-        },
-        "timeoff-end-date": {
-          "type": "datepicker",
-          "selected_date": "2024-12-30"
-        }
-      }
-    }
+    "values": []
   },
-  "response_url": "https://hooks.slack.com/actions/T073G7T7JQY/7138183798101/VdTV4EgwG3YzRv8JlTj7tysI",
+  "response_url": "https://hooks.slack.com/actions/T073G7T7JQY/7175833173553/AiUEAHQsxOGnvezKhmFYSx7j",
   "actions": [
     {
       "action_id": "timeoff-btn-remove",
-      "block_id": "fGziC",
+      "block_id": "hQ/7x",
       "text": {
         "type": "plain_text",
-        "text": "Remove Time Off",
+        "text": "remove",
         "emoji": true
       },
-      "value": "timeoff-btn-remove",
+      "value": "018fa120-52bf-7537-931d-e57e6498d44a",
       "style": "danger",
       "type": "button",
-      "action_ts": "1716159491.440306"
+      "action_ts": "1716462850.834766"
     }
   ]
 }

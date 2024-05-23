@@ -7,6 +7,7 @@ use App\Entity\SlackCommand;
 use App\Entity\UserTimeOff;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Command\InteractivityDetailsDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\ActionCollection;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\StateCollection;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\ButtonActionElement;
@@ -16,7 +17,6 @@ use App\Services\SlackNotifier\Block\SlackDatePickerBlockElement;
 use App\Services\SlackNotifier\Block\SlackTextWithActionButtonBlockElement;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use JetBrains\PhpStorm\ArrayShape;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
@@ -31,10 +31,11 @@ use Symfony\Component\Notifier\Message\SentMessage;
 class TimeOffCommandProcessor
 {
     public function __construct(
-        protected readonly ParameterBagInterface $parameterBag,
+        protected readonly ParameterBagInterface  $parameterBag,
         protected readonly EntityManagerInterface $entityManager,
-        protected readonly LoggerInterface $slackInputLogger
-    ) {
+        protected readonly LoggerInterface        $slackInputLogger
+    )
+    {
     }
 
     public function process(SlackCommand $command): BotResponseDto
@@ -43,6 +44,7 @@ class TimeOffCommandProcessor
             CommandList::TimeOff => $this->sendInteractivityForm($command),
             CommandList::TimeOffBtnAdd => $this->add($command),
             CommandList::TimeOffBtnShow => $this->show($command),
+            CommandList::TimeOffBtnRemove => $this->remove($command),
             default => throw new \Exception('Time off command not defined.'),
         };
     }
@@ -53,45 +55,45 @@ class TimeOffCommandProcessor
             ->block(
                 (new SlackSectionBlock())
                     ->text('Start date:')
-                ->accessory(
-                    new SlackDatePickerBlockElement(
-                        new \DateTime('2024-12-30 10:45:55'),
-                        'timeoff-start-date',
-                        'Start date'
+                    ->accessory(
+                        new SlackDatePickerBlockElement(
+                            new \DateTime('2024-12-30 10:45:55'),
+                            'timeoff-start-date',
+                            'Start date'
+                        )
                     )
-                )
             )
             ->block(
                 (new SlackSectionBlock())
                     ->text('End date:')
-                ->accessory(
-                    new SlackDatePickerBlockElement(
-                        new \DateTime('2024-12-30 10:45:55'),
-                        'timeoff-end-date',
-                        'End date'
+                    ->accessory(
+                        new SlackDatePickerBlockElement(
+                            new \DateTime('2024-12-30 10:45:55'),
+                            'timeoff-end-date',
+                            'End date'
+                        )
                     )
-                )
             )
             ->block(new SlackDividerBlock())
             ->block(
                 (new SlackActionsBlock())
-                ->buttonAction(
-                'Add Time Off',
-                'timeoff-btn-add',
-                'timeoff-btn-add',
-                )
-                ->buttonAction(
-                    'Remove Time Off',
-                    'timeoff-btn-remove',
-                    'timeoff-btn-remove',
-                    'danger'
-                )
-                ->buttonAction(
-                    'Show All Time Off',
-                    'timeoff-btn-show',
-                    'timeoff-btn-show',
-                    'primary'
-                )
+                    ->buttonAction(
+                        'Add Time Off',
+                        'timeoff-btn-add',
+                        'timeoff-btn-add',
+                    )
+                    ->buttonAction(
+                        'Remove Time Off',
+                        'timeoff-btn-remove',
+                        'timeoff-btn-remove',
+                        'danger'
+                    )
+                    ->buttonAction(
+                        'Show All Time Off',
+                        'timeoff-btn-show',
+                        'timeoff-btn-show',
+                        'primary'
+                    )
             );
 
         $response = $this->sendCommandAnswer(
@@ -105,12 +107,7 @@ class TimeOffCommandProcessor
         return new BotResponseDto('');
     }
 
-    #[ArrayShape([
-        'type' => 'string',
-        'state' => StateCollection::class,
-        'actions' => ActionCollection::class,
-    ])]
-    protected function mineDataFromAddRemoveCommand(string $text): array
+    protected function mineDataFromAddRemoveCommand(string $text): InteractivityDetailsDto
     {
         $data = json_decode($text, true);
 
@@ -138,10 +135,11 @@ class TimeOffCommandProcessor
             }
         }
 
-        $data['state'] = $states;
-        $data['actions'] = $actions;
-
-        return $data;
+        return new InteractivityDetailsDto(
+            $data['type'],
+            $states,
+            $actions
+        );
     }
 
     protected function add(SlackCommand $command): BotResponseDto
@@ -149,8 +147,8 @@ class TimeOffCommandProcessor
         $data = $this->mineDataFromAddRemoveCommand($command->getText());
         $this->slackInputLogger->debug('slack command timeoff-btn-add data', [$data]);
 
-        $startDate = $data['state']->offsetGet('timeoff-start-date')->date;
-        $endDate = $data['state']->offsetGet('timeoff-end-date')->date;
+        $startDate = $data->states->offsetGet('timeoff-start-date')->date;
+        $endDate = $data->states->offsetGet('timeoff-end-date')->date;
 
         if ($startDate > $endDate) {
             throw new \Exception('Wrong time range');
@@ -181,15 +179,58 @@ class TimeOffCommandProcessor
                 . '`';
         } else {
             $text = 'You added time off from `'
-            . $startDateFormatted
-            . '` to `'
-            . $endDateFormatted
-            . '`';
+                . $startDateFormatted
+                . '` to `'
+                . $endDateFormatted
+                . '`';
         }
 
         $answer = new BotResponseDto($text);
 
         $this->sendCommandAnswer($command, $answer->text);
+
+        return $answer;
+    }
+
+    protected function remove(SlackCommand $command): BotResponseDto
+    {
+        $data = $this->mineDataFromAddRemoveCommand($command->getText());
+        $this->slackInputLogger->debug(
+            sprintf('slack command %s data', CommandList::TimeOffBtnRemove->value),
+            [$data]
+        );
+
+        $text = 'Unknown time off to remove.';
+
+        /** @var ButtonActionElement $action */
+        foreach ($data->actions as $action) {
+            if (CommandList::TimeOffBtnRemove->value === $action->getActionId()) {
+                $timeOff = $this->entityManager->getRepository(UserTimeOff::class)->find($action->getValue());
+                if ($timeOff instanceof UserTimeOff) {
+                    $this->entityManager->remove($timeOff);
+                    $this->entityManager->flush();
+
+                    $text = 'Removed: ' . $this->convertTimeOffToString($timeOff);
+                }
+            }
+        };
+
+        $answer = new BotResponseDto($text);
+
+        $showCommand = new SlackCommand();
+        $showCommand->setCommandName(CommandList::TimeOffBtnShow);
+        $showCommand->setText(
+            sprintf(
+                '{"parentCommand":"%s","parentId":"%s"',
+                $command->getCommandName()->value,
+                $command->getRawId()
+            )
+        );
+        $showCommand->setTeam($command->getTeam());
+        $showCommand->setUser($command->getUser());
+        $showCommand->setChannel($command->getChannel());
+
+        $this->show($showCommand);
 
         return $answer;
     }
@@ -205,17 +246,10 @@ class TimeOffCommandProcessor
 
         $slackOptions = (new SlackOptions())
             ->block(new SlackDividerBlock())
-            ->block(new SlackHeaderBlock('Time Off that you have:'))
-        ;
+            ->block(new SlackHeaderBlock('Time Off that you have:'));
 
         foreach ($timeOffCollection as $timeOff) {
-            $startAt = $timeOff->getStartAt()->format('Y-m-d');
-            $endAt = $timeOff->getEndAt()->format('Y-m-d');
-            $text = '`' . $startAt . '`';
-            if ($startAt !== $endAt) {
-                $text .= ' - ';
-                $text .= '`' . $endAt . '`';
-            }
+            $text = $this->convertTimeOffToString($timeOff);
 
             $slackOptions->block(
                 (new SlackSectionBlock())
@@ -244,6 +278,19 @@ class TimeOffCommandProcessor
         );
 
         return $answer;
+    }
+
+    protected function convertTimeOffToString(UserTimeOff $timeOff): string
+    {
+        $startAt = $timeOff->getStartAt()->format('Y-m-d');
+        $endAt = $timeOff->getEndAt()->format('Y-m-d');
+        $text = '`' . $startAt . '`';
+        if ($startAt !== $endAt) {
+            $text .= ' - ';
+            $text .= '`' . $endAt . '`';
+        }
+
+        return $text;
     }
 
     protected function sendCommandAnswer(
