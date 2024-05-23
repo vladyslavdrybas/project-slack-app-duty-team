@@ -19,7 +19,7 @@ class SlackActionsBlock extends AbstractSlackBlock
         string $text,
         string $actionId,
         string $value,
-        ?string $style = null
+        string $style = 'primary'
     ): static {
         if (25 === \count($this->options['elements'] ?? [])) {
             throw new \LogicException('Maximum number of elements should not exceed 25.');
@@ -33,12 +33,8 @@ class SlackActionsBlock extends AbstractSlackBlock
             ],
             'action_id' => $actionId,
             'value' => $value,
+            'style' => $style,
         ];
-
-        if ($style) {
-            // primary or danger
-            $element['style'] = $style;
-        }
 
         $this->options['elements'][] = $element;
 
@@ -51,7 +47,7 @@ class SlackActionsBlock extends AbstractSlackBlock
     public function datepicker(
         \DateTimeInterface $initialDate,
         ?string $actionId = null,
-        ?string $placeholder = null,
+        ?string $placeholder = null
     ): static {
         if (25 === \count($this->options['elements'] ?? [])) {
             throw new \LogicException('Maximum number of elements should not exceed 25.');

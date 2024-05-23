@@ -12,16 +12,21 @@ use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\StateC
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\ButtonActionElement;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\DatePickerState;
 use App\Services\SlackNotifier\Block\SlackActionsBlock;
+use App\Services\SlackNotifier\Block\SlackDatePickerBlockElement;
+use App\Services\SlackNotifier\Block\SlackTextWithActionButtonBlockElement;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JetBrains\PhpStorm\ArrayShape;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
 use Symfony\Component\Notifier\Chatter;
 use Symfony\Component\Notifier\Message\ChatMessage;
+use Symfony\Component\Notifier\Message\SentMessage;
 
 class TimeOffCommandProcessor
 {
@@ -37,36 +42,34 @@ class TimeOffCommandProcessor
         return match ($command->getCommandName()) {
             CommandList::TimeOff => $this->sendInteractivityForm($command),
             CommandList::TimeOffBtnAdd => $this->add($command),
+            CommandList::TimeOffBtnShow => $this->show($command),
             default => throw new \Exception('Time off command not defined.'),
         };
     }
 
     protected function sendInteractivityForm(SlackCommand $command): BotResponseDto
     {
-        $botApiToken = $this->parameterBag->get('duty_team_slack_bot_api_token');
-        $channelId = $command->getChannel()->getChannelId();
-        $text = 'Add Time Off:';
-
-        $slackTransport = new SlackTransport(
-            $botApiToken,
-            $channelId
-        );
-        $chatter = new Chatter($slackTransport);
-
-        $chatMessage = new ChatMessage($text);
-
         $slackOptions = (new SlackOptions())
             ->block(
-                (new SlackActionsBlock())
-                ->datepicker(
-                    new \DateTime('2024-12-30 10:45:55'),
-                    'timeoff-start-date',
-                    'Start date'
+                (new SlackSectionBlock())
+                    ->text('Start date:')
+                ->accessory(
+                    new SlackDatePickerBlockElement(
+                        new \DateTime('2024-12-30 10:45:55'),
+                        'timeoff-start-date',
+                        'Start date'
+                    )
                 )
-                ->datepicker(
-                    new \DateTime('2024-12-30 10:45:55'),
-                    'timeoff-end-date',
-                    'End date'
+            )
+            ->block(
+                (new SlackSectionBlock())
+                    ->text('End date:')
+                ->accessory(
+                    new SlackDatePickerBlockElement(
+                        new \DateTime('2024-12-30 10:45:55'),
+                        'timeoff-end-date',
+                        'End date'
+                    )
                 )
             )
             ->block(new SlackDividerBlock())
@@ -83,12 +86,19 @@ class TimeOffCommandProcessor
                     'timeoff-btn-remove',
                     'danger'
                 )
+                ->buttonAction(
+                    'Show All Time Off',
+                    'timeoff-btn-show',
+                    'timeoff-btn-show',
+                    'primary'
+                )
             );
 
-        // Add the custom options to the chat message and send the message
-        $chatMessage->options($slackOptions);
-
-        $response = $chatter->send($chatMessage);
+        $response = $this->sendCommandAnswer(
+            $command,
+            'Time Off',
+            $slackOptions
+        );
 
         $this->slackInputLogger->debug('slack response on timeoff add', [$response]);
 
@@ -179,13 +189,68 @@ class TimeOffCommandProcessor
 
         $answer = new BotResponseDto($text);
 
-        $this->sendCommandAnswer($command, $answer);
+        $this->sendCommandAnswer($command, $answer->text);
 
         return $answer;
     }
 
-    protected function sendCommandAnswer(SlackCommand $command, BotResponseDto $answer): void
+    protected function show(SlackCommand $command): BotResponseDto
     {
+        $timeOffCollection = $this->entityManager->getRepository(UserTimeOff::class)
+            ->findBy([
+                'user' => $command->getUser(),
+            ]);
+
+        $answer = new BotResponseDto('');
+
+        $slackOptions = (new SlackOptions())
+            ->block(new SlackDividerBlock())
+            ->block(new SlackHeaderBlock('Time Off that you have:'))
+        ;
+
+        foreach ($timeOffCollection as $timeOff) {
+            $startAt = $timeOff->getStartAt()->format('Y-m-d');
+            $endAt = $timeOff->getEndAt()->format('Y-m-d');
+            $text = '`' . $startAt . '`';
+            if ($startAt !== $endAt) {
+                $text .= ' - ';
+                $text .= '`' . $endAt . '`';
+            }
+
+            $slackOptions->block(
+                (new SlackSectionBlock())
+                    ->text($text)
+                    ->accessory(
+                        new SlackTextWithActionButtonBlockElement(
+                            'remove',
+                            'timeoff-btn-remove',
+                            $timeOff->getRawId(),
+                            'danger'
+                        )
+                    )
+            );
+        }
+
+        if (0 === count($timeOffCollection)) {
+            $slackOptions->block((new SlackSectionBlock())->text('no dates yet'));
+        }
+
+        $slackOptions->block(new SlackDividerBlock());
+
+        $this->sendCommandAnswer(
+            $command,
+            $answer->text,
+            $slackOptions
+        );
+
+        return $answer;
+    }
+
+    protected function sendCommandAnswer(
+        SlackCommand $command,
+        string $text,
+        ?SlackOptions $options = null
+    ): ?SentMessage {
         $botApiToken = $this->parameterBag->get('duty_team_slack_bot_api_token');
         $channelId = $command->getChannel()->getChannelId();
 
@@ -195,7 +260,12 @@ class TimeOffCommandProcessor
         );
         $chatter = new Chatter($slackTransport);
 
-        $chatMessage = new ChatMessage($answer->text);
-        $response = $chatter->send($chatMessage);
+        $chatMessage = new ChatMessage($text);
+
+        if (null !== $options) {
+            $chatMessage->options($options);
+        }
+
+        return $chatter->send($chatMessage);
     }
 }
