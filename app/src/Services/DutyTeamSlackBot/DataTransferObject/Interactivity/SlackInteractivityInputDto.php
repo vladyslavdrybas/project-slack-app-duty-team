@@ -38,7 +38,7 @@ readonly class SlackInteractivityInputDto
         public string $userName,
 
         #[SerializedPath('[state][values]')]
-        public array $state,
+        public array $states,
 
         #[SerializedName('actions')]
         public array $actions

@@ -10,8 +10,10 @@ use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\ButtonActionE
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\DatePickerState;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\InteractivityDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\SlackInteractivityInputDto;
+use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\TextInputState;
 use App\Services\DutyTeamSlackBot\DataTransferObject\TeamDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\UserDto;
+use DateTime;
 
 class SlackInteractivityTransformer
 {
@@ -20,14 +22,22 @@ class SlackInteractivityTransformer
         $states = new StateCollection();
         $actions = new ActionCollection();
 
-        foreach ($input->state as $blockState) {
+        foreach ($input->states as $blockState) {
             if (is_array($blockState)) {
                 foreach ($blockState as $key => $state) {
-                    if ('datepicker' === $state['type']) {
-                        $states->offsetSet(
-                            $key,
-                            new DatePickerState(new \DateTime($state['selected_date']))
-                        );
+                    switch ($state['type']) {
+                        case 'datepicker':
+                            $states->offsetSet(
+                                $key,
+                                new DatePickerState(new DateTime($state['selected_date']))
+                            );
+                            break;
+                        case 'plain_text_input':
+                            $states->offsetSet(
+                                $key,
+                                new TextInputState($state['value'])
+                            );
+                            break;
                     }
                 }
             }

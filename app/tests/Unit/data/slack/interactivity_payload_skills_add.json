@@ -1,0 +1,138 @@
+{
+  "type": "block_actions",
+  "user": {
+    "id": "U072CSZ2M2T",
+    "username": "ukdvvw",
+    "name": "ukdvvw",
+    "team_id": "T073G7T7JQY"
+  },
+  "api_app_id": "A072TBG8YEP",
+  "token": "UJgP8ayNRekblYLwTfW9swvr",
+  "container": {
+    "type": "message",
+    "message_ts": "1716549169.834419",
+    "channel_id": "D073JLYEMQQ",
+    "is_ephemeral": false
+  },
+  "trigger_id": "7163202557766.7118265256848.3e24f9d5736bfba1ac3c8bf355a6ad86",
+  "team": {
+    "id": "T073G7T7JQY",
+    "domain": "vladyslavdryb-tdt2059"
+  },
+  "enterprise": null,
+  "is_enterprise_install": false,
+  "channel": {
+    "id": "D073JLYEMQQ",
+    "name": "directmessage"
+  },
+  "message": {
+    "user": "U072VPS2VQT",
+    "type": "message",
+    "ts": "1716549169.834419",
+    "bot_id": "B072YBM2XNY",
+    "app_id": "A072TBG8YEP",
+    "text": "Time Off",
+    "team": "T073G7T7JQY",
+    "blocks": [
+      {
+        "type": "header",
+        "block_id": "OIjDf",
+        "text": {
+          "type": "plain_text",
+          "text": "Add skills that can be used to solve tasks:",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "hDCzz",
+        "label": {
+          "type": "plain_text",
+          "text": "Add skills. Split them via `;`",
+          "emoji": true
+        },
+        "optional": false,
+        "dispatch_action": false,
+        "element": {
+          "type": "plain_text_input",
+          "action_id": "skills-input-field",
+          "multiline": true,
+          "dispatch_action_config": {
+            "trigger_actions_on": [
+              "on_enter_pressed"
+            ]
+          }
+        }
+      },
+      {
+        "type": "divider",
+        "block_id": "QZKW3"
+      },
+      {
+        "type": "actions",
+        "block_id": "27aGQ",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "skills-btn-add",
+            "text": {
+              "type": "plain_text",
+              "text": "Add Skills",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "skills-btn-add"
+          },
+          {
+            "type": "button",
+            "action_id": "skills-btn-remove",
+            "text": {
+              "type": "plain_text",
+              "text": "Remove Skills",
+              "emoji": true
+            },
+            "style": "danger",
+            "value": "skills-btn-remove"
+          },
+          {
+            "type": "button",
+            "action_id": "skills-btn-show",
+            "text": {
+              "type": "plain_text",
+              "text": "Show All Skills",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "skills-btn-show"
+          }
+        ]
+      }
+    ]
+  },
+  "state": {
+    "values": {
+      "hDCzz": {
+        "skills-input-field": {
+          "type": "plain_text_input",
+          "value": "php;javascript;docker; humor"
+        }
+      }
+    }
+  },
+  "response_url": "https://hooks.slack.com/actions/T073G7T7JQY/7169721985459/AFDZNiVa3HHuZRLAj17ssiHh",
+  "actions": [
+    {
+      "action_id": "skills-btn-add",
+      "block_id": "27aGQ",
+      "text": {
+        "type": "plain_text",
+        "text": "Add Skills",
+        "emoji": true
+      },
+      "value": "skills-btn-add",
+      "style": "primary",
+      "type": "button",
+      "action_ts": "1716550792.583771"
+    }
+  ]
+}

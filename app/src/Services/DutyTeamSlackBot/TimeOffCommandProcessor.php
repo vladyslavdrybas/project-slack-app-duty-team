@@ -7,41 +7,21 @@ use App\Entity\SlackCommand;
 use App\Entity\UserTimeOff;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Command\InteractivityDetailsDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\ActionCollection;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\StateCollection;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\ButtonActionElement;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\DatePickerState;
 use App\Services\SlackNotifier\Block\SlackActionsBlock;
 use App\Services\SlackNotifier\Block\SlackDatePickerBlockElement;
 use App\Services\SlackNotifier\Block\SlackTextWithActionButtonBlockElement;
-use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
-use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
-use Symfony\Component\Notifier\Chatter;
-use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Message\SentMessage;
 
-class TimeOffCommandProcessor
+class TimeOffCommandProcessor extends AbstractCommandProcessor
 {
-    public function __construct(
-        protected readonly ParameterBagInterface  $parameterBag,
-        protected readonly EntityManagerInterface $entityManager,
-        protected readonly LoggerInterface        $slackInputLogger
-    )
-    {
-    }
-
     public function process(SlackCommand $command): BotResponseDto
     {
         return match ($command->getCommandName()) {
-            CommandList::TimeOff => $this->sendInteractivityForm($command),
+            CommandList::TimeOff => $this->interactivityForm($command),
             CommandList::TimeOffBtnAdd => $this->add($command),
             CommandList::TimeOffBtnShow => $this->show($command),
             CommandList::TimeOffBtnRemove => $this->remove($command),
@@ -49,7 +29,20 @@ class TimeOffCommandProcessor
         };
     }
 
-    protected function sendInteractivityForm(SlackCommand $command): BotResponseDto
+    protected function convertTimeOffToString(UserTimeOff $timeOff): string
+    {
+        $startAt = $timeOff->getStartAt()->format('Y-m-d');
+        $endAt = $timeOff->getEndAt()->format('Y-m-d');
+        $text = '`' . $startAt . '`';
+        if ($startAt !== $endAt) {
+            $text .= ' - ';
+            $text .= '`' . $endAt . '`';
+        }
+
+        return $text;
+    }
+
+    protected function interactivityForm(SlackCommand $command): BotResponseDto
     {
         $options = new SlackOptions();
 
@@ -109,44 +102,9 @@ class TimeOffCommandProcessor
         return new BotResponseDto('');
     }
 
-    protected function mineDataFromAddRemoveCommand(string $text): InteractivityDetailsDto
-    {
-        $data = json_decode($text, true);
-
-        $states = new StateCollection();
-        $actions = new ActionCollection();
-
-        foreach ($data['state'] as $key => $state) {
-            if ('datepicker' === $state['type']) {
-                $states->offsetSet(
-                    $key,
-                    new DatePickerState(new DateTime($state['date']['date']))
-                );
-            }
-        }
-
-        foreach ($data['actions'] as $action) {
-            if ('button' === $action['type']) {
-                $actions->append(
-                    new ButtonActionElement(
-                        $action['actionId'],
-                        $action['value'],
-                        $action['text']
-                    )
-                );
-            }
-        }
-
-        return new InteractivityDetailsDto(
-            $data['type'],
-            $states,
-            $actions
-        );
-    }
-
     protected function add(SlackCommand $command): BotResponseDto
     {
-        $data = $this->mineDataFromAddRemoveCommand($command->getText());
+        $data = $this->mineInteractivityDataFromCommand($command->getText());
         $this->slackInputLogger->debug('slack command timeoff-btn-add data', [$data]);
 
         $startDate = $data->states->offsetGet('timeoff-start-date')->date;
@@ -196,7 +154,7 @@ class TimeOffCommandProcessor
 
     protected function remove(SlackCommand $command): BotResponseDto
     {
-        $data = $this->mineDataFromAddRemoveCommand($command->getText());
+        $data = $this->mineInteractivityDataFromCommand($command->getText());
         $this->slackInputLogger->debug(
             sprintf('slack command %s data', CommandList::TimeOffBtnRemove->value),
             [$data]
@@ -282,41 +240,5 @@ class TimeOffCommandProcessor
         );
 
         return $answer;
-    }
-
-    protected function convertTimeOffToString(UserTimeOff $timeOff): string
-    {
-        $startAt = $timeOff->getStartAt()->format('Y-m-d');
-        $endAt = $timeOff->getEndAt()->format('Y-m-d');
-        $text = '`' . $startAt . '`';
-        if ($startAt !== $endAt) {
-            $text .= ' - ';
-            $text .= '`' . $endAt . '`';
-        }
-
-        return $text;
-    }
-
-    protected function sendCommandAnswer(
-        SlackCommand $command,
-        string $text,
-        ?SlackOptions $options = null
-    ): ?SentMessage {
-        $botApiToken = $this->parameterBag->get('duty_team_slack_bot_api_token');
-        $channelId = $command->getChannel()->getChannelId();
-
-        $slackTransport = new SlackTransport(
-            $botApiToken,
-            $channelId
-        );
-        $chatter = new Chatter($slackTransport);
-
-        $chatMessage = new ChatMessage($text);
-
-        if (null !== $options) {
-            $chatMessage->options($options);
-        }
-
-        return $chatter->send($chatMessage);
     }
 }

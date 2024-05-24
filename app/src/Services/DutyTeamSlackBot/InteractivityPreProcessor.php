@@ -43,7 +43,7 @@ class InteractivityPreProcessor extends AbstractPreProcessor
     {
         return json_encode([
             'type' => $dto->type,
-            'state' => $dto->state->getArrayCopy(),
+            'states' => $dto->states->getArrayCopy(),
             'actions' => $dto->actions->getArrayCopy(),
         ]);
     }

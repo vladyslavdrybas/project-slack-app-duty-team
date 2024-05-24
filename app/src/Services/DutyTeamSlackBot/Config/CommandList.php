@@ -5,9 +5,10 @@ namespace App\Services\DutyTeamSlackBot\Config;
 
 enum CommandList: string
 {
-    case SkillsAdd = 'skills-add';
-    case SkillsRemove = 'skills-remove';
-    case SkillsShow = 'skills-show';
+    case Skills = 'skills';
+    case SkillsBtnAdd = 'skills-btn-add';
+    case SkillsBtnShow = 'skills-btn-show';
+    case SkillsBtnRemove = 'skills-btn-remove';
     case TimeOff = 'timeoff';
     case TimeOffBtnAdd = 'timeoff-btn-add';
     case TimeOffBtnShow = 'timeoff-btn-show';
@@ -16,7 +17,7 @@ enum CommandList: string
     public function isSkillsCommand(): bool
     {
         return match ($this) {
-            self::SkillsAdd, self::SkillsRemove, self::SkillsShow => true,
+            self::Skills, self::SkillsBtnAdd, self::SkillsBtnRemove, self::SkillsBtnShow => true,
             default => false,
         };
     }

@@ -20,7 +20,7 @@ readonly class InteractivityDto implements ISlackMessageIdentifier
         public ChannelDto   $channel,
         public UserDto      $user,
         public string       $type,
-        public StateCollection $state,
+        public StateCollection $states,
         public ActionCollection $actions
     ) {}
 
@@ -59,9 +59,9 @@ readonly class InteractivityDto implements ISlackMessageIdentifier
         return $this->type;
     }
 
-    public function getState(): StateCollection
+    public function getStates(): StateCollection
     {
-        return $this->state;
+        return $this->states;
     }
 
     /**

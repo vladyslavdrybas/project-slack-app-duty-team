@@ -7,27 +7,69 @@ use App\Entity\SlackCommand;
 use App\Entity\UserSkills;
 use App\Services\DutyTeamSlackBot\Config\CommandList;
 use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use App\Services\SlackNotifier\Block\SlackActionsBlock;
+use App\Services\SlackNotifier\Block\SlackInputBlock;
+use App\Services\SlackNotifier\Block\SlackTextInputBlockElement;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 
-class SkillsCommandProcessor
+class SkillsCommandProcessor extends AbstractCommandProcessor
 {
-    public function __construct(
-        protected readonly ParameterBagInterface $parameterBag,
-        protected readonly EntityManagerInterface $entityManager,
-        protected readonly LoggerInterface $slackInputLogger
-    ) {
-    }
-
     public function process(SlackCommand $command): BotResponseDto
     {
         return match ($command->getCommandName()) {
-            CommandList::SkillsAdd => $this->add($command),
-            CommandList::SkillsRemove => $this->remove($command),
-            CommandList::SkillsShow => $this->show($command),
+            CommandList::Skills => $this->interactivityForm($command),
+            CommandList::SkillsBtnAdd => $this->add($command),
+            CommandList::SkillsBtnShow => $this->show($command),
+            CommandList::SkillsBtnRemove => $this->remove($command),
             default => throw new \Exception('Skills command not defined.'),
         };
+    }
+
+    protected function interactivityForm(SlackCommand $command): BotResponseDto
+    {
+        $options = new SlackOptions();
+
+        $slackOptions = $options
+            ->block(new SlackHeaderBlock('Add skills that can be used to solve tasks:'))
+            ->block(
+                (new SlackInputBlock())
+                    ->label('Add skills. Split them via `;`')
+                    ->element(
+                        new SlackTextInputBlockElement('skills-input-field')
+                    )
+            )
+            ->block(new SlackDividerBlock())
+            ->block(
+                (new SlackActionsBlock())
+                    ->buttonAction(
+                        'Add Skills',
+                        'skills-btn-add',
+                        'skills-btn-add',
+                    )
+                    ->buttonAction(
+                        'Remove Skills',
+                        'skills-btn-remove',
+                        'skills-btn-remove',
+                        'danger'
+                    )
+                    ->buttonAction(
+                        'Show All Skills',
+                        'skills-btn-show',
+                        'skills-btn-show'
+                    )
+            );
+
+        $response = $this->sendCommandAnswer(
+            $command,
+            'Time Off',
+            $slackOptions
+        );
+
+        $this->slackInputLogger->debug('slack response on timeoff add', [$response]);
+
+        return new BotResponseDto('');
     }
 
     protected function answerAllSkills(array $skills): BotResponseDto
@@ -38,7 +80,7 @@ class SkillsCommandProcessor
         return new BotResponseDto($answer);
     }
 
-    protected function mineDataFromCommand(string $text): array
+    protected function mineSkills(string $text): array
     {
         $data = explode(';', $text);
         $data = array_filter($data, function($item) { return !empty($item); });
@@ -54,6 +96,11 @@ class SkillsCommandProcessor
 
     protected function add(SlackCommand $command): BotResponseDto
     {
+        $data = $this->mineInteractivityDataFromCommand($command->getText());
+        $this->slackInputLogger->debug('slack command timeoff-btn-add data', [$data]);
+
+        $text = $data->states->offsetGet('skills-input-field')->value;
+
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
         ]);
@@ -68,7 +115,7 @@ class SkillsCommandProcessor
             array_unique(
                 array_merge(
                     $userSkills->getSkills(),
-                    $this->mineDataFromCommand($command->getText())
+                    $this->mineSkills($text)
                 )
             )
         );
@@ -101,7 +148,7 @@ class SkillsCommandProcessor
             array_unique(
                 array_diff(
                     $userSkills->getSkills(),
-                    $this->mineDataFromCommand($command->getText())
+                    $this->mineSkills($command->getText())
                 )
             )
         );
