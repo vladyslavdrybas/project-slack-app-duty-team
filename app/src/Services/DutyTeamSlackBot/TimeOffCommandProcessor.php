@@ -51,7 +51,9 @@ class TimeOffCommandProcessor
 
     protected function sendInteractivityForm(SlackCommand $command): BotResponseDto
     {
-        $slackOptions = (new SlackOptions())
+        $options = new SlackOptions();
+
+        $slackOptions = $options
             ->block(
                 (new SlackSectionBlock())
                     ->text('Start date:')
@@ -244,7 +246,9 @@ class TimeOffCommandProcessor
 
         $answer = new BotResponseDto('');
 
-        $slackOptions = (new SlackOptions())
+        $options = new SlackOptions();
+
+        $slackOptions = $options
             ->block(new SlackDividerBlock())
             ->block(new SlackHeaderBlock('Time Off that you have:'));
 
