@@ -12,6 +12,7 @@ use App\Services\SlackNotifier\Block\SlackInputBlock;
 use App\Services\SlackNotifier\Block\SlackTextInputBlockElement;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 
 class SkillsCommandProcessor extends AbstractCommandProcessor
@@ -129,11 +130,18 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
 
         $this->slackInputLogger->debug('userSkills', [$skills]);
 
+        $this->show($command);
+
         return $this->answerAllSkills($userSkills->getSkills());
     }
 
     protected function remove(SlackCommand $command): BotResponseDto
     {
+        $data = $this->mineInteractivityDataFromCommand($command->getText());
+        $this->slackInputLogger->debug('slack command timeoff-btn-add data', [$data]);
+
+        $text = $data->states->offsetGet('skills-input-field')->value;
+
         $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
             'slackUser' => $command->getUser(),
         ]);
@@ -148,7 +156,7 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
             array_unique(
                 array_diff(
                     $userSkills->getSkills(),
-                    $this->mineSkills($command->getText())
+                    $this->mineSkills($text)
                 )
             )
         );
@@ -162,6 +170,8 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
 
         $this->slackInputLogger->debug('userSkills', [$skills]);
 
+        $this->show($command);
+
         return $this->answerAllSkills($userSkills->getSkills());
     }
 
@@ -171,11 +181,31 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
             'slackUser' => $command->getUser(),
         ]);
 
-        $skills = [];
-        if (null !== $userSkills) {
-            $skills = $userSkills->getSkills();
+        $answer = new BotResponseDto('');
+
+        $options = new SlackOptions();
+
+        $slackOptions = $options
+            ->block(new SlackHeaderBlock('Skills that you have:'));
+
+        $text = '';
+        foreach ($userSkills->getSkills() as $skill) {
+            $text .= ' `' . $skill . '` ';
         }
 
-        return $this->answerAllSkills($skills);
+        $slackOptions->block(
+            (new SlackSectionBlock())
+                ->text($text)
+        );
+
+        $slackOptions->block(new SlackDividerBlock());
+
+        $this->sendCommandAnswer(
+            $command,
+            $answer->text,
+            $slackOptions
+        );
+
+        return $answer;
     }
 }
