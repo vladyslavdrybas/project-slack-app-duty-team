@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\SlackCommand;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 
 /**
  * @method SlackCommand|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,7 +18,7 @@ class SlackCommandRepository extends AbstractRepository
     {
         return $this->findBy(
             [
-                'commandName' => CommandList::SkillsAdd,
+                'commandName' => CommandName::SkillsAdd,
             ],
             [
                 'createdAt' => $order,

@@ -8,24 +8,24 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserSkillsRepository::class, readOnly: false)]
-#[ORM\Table(name: "slack_user_skills")]
+#[ORM\Table(name: "user_skills")]
 class UserSkills extends AbstractEntity
 {
-    #[ORM\OneToOne(targetEntity: SlackUser::class)]
-    #[ORM\JoinColumn(name:'slack_user_id', referencedColumnName: 'id', nullable: false)]
-    protected SlackUser $slackUser;
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name:'owner_id', referencedColumnName: 'id', nullable: false)]
+    protected User $owner;
 
     #[ORM\Column( name: "skills", type: Types::JSON)]
     protected array $skills = [];
 
-    public function getSlackUser(): SlackUser
+    public function getOwner(): User
     {
-        return $this->slackUser;
+        return $this->owner;
     }
 
-    public function setSlackUser(SlackUser $slackUser): void
+    public function setOwner(User $owner): void
     {
-        $this->slackUser = $slackUser;
+        $this->owner = $owner;
     }
 
     public function getSkills(): array

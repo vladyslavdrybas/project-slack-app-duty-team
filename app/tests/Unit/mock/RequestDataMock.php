@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\mock;
 
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use Symfony\Component\Finder\Finder;
 
 class RequestDataMock
@@ -42,7 +42,12 @@ class RequestDataMock
 
     public function getAddSkillsCommand(): array
     {
-        return $this->getData($this->slackDataPath, 'command*skills*add.json', CommandList::SkillsAdd->value);
+        return $this->getData($this->slackDataPath, 'command_skills_add.json', CommandName::Skills->value);
+    }
+
+    public function getAddSkillsInteractivityMessage(): array
+    {
+        return $this->getData($this->slackDataPath, 'interactivity_payload_skills_add.json', CommandName::SkillsBtnAdd->value);
     }
 
     public function getInteractivityMessage(): array

@@ -10,11 +10,11 @@
   "token": "UJgP8ayNRekblYLwTfW9swvr",
   "container": {
     "type": "message",
-    "message_ts": "1716549169.834419",
+    "message_ts": "1716594709.474329",
     "channel_id": "D073JLYEMQQ",
     "is_ephemeral": false
   },
-  "trigger_id": "7163202557766.7118265256848.3e24f9d5736bfba1ac3c8bf355a6ad86",
+  "trigger_id": "7170277649653.7118265256848.12324f05d081f6b80a378b4a5c2122e0",
   "team": {
     "id": "T073G7T7JQY",
     "domain": "vladyslavdryb-tdt2059"
@@ -28,7 +28,7 @@
   "message": {
     "user": "U072VPS2VQT",
     "type": "message",
-    "ts": "1716549169.834419",
+    "ts": "1716594709.474329",
     "bot_id": "B072YBM2XNY",
     "app_id": "A072TBG8YEP",
     "text": "Time Off",
@@ -114,12 +114,12 @@
       "hDCzz": {
         "skills-input-field": {
           "type": "plain_text_input",
-          "value": "php;javascript;docker; humor"
+          "value": "php;chatbot;redis"
         }
       }
     }
   },
-  "response_url": "https://hooks.slack.com/actions/T073G7T7JQY/7169721985459/AFDZNiVa3HHuZRLAj17ssiHh",
+  "response_url": "https://hooks.slack.com/actions/T073G7T7JQY/7173182058530/WXi3Bxt825D19jXp6thYGR58",
   "actions": [
     {
       "action_id": "skills-btn-add",
@@ -132,7 +132,7 @@
       "value": "skills-btn-add",
       "style": "primary",
       "type": "button",
-      "action_ts": "1716550792.583771"
+      "action_ts": "1716595523.627436"
     }
   ]
 }

@@ -8,6 +8,7 @@ use App\DataTransferObject\GithubUserDto;
 use App\Entity\User;
 use App\Exceptions\AlreadyExists;
 use App\Repository\UserRepository;
+use App\Services\DutyTeamSlackBot\DataTransferObject\reader\UserInfoDto;
 use App\Utility\EmailHasher;
 use App\Utility\RandomGenerator;
 use InvalidArgumentException;
@@ -73,5 +74,19 @@ class UserBuilder implements IEntityBuilder
         $username = $githubUserDto->username ?? null;
 
         return $this->base($email, $password, $username);
+    }
+
+    public function slack(UserInfoDto $dto): User
+    {
+        $password = $this->randomGenerator->sha256($dto->email);
+        $username = $dto->username ?? null;
+
+        $user = $this->base($dto->email, $password, $username);
+        $user->setFirstName($dto->firstName);
+        $user->setLastname($dto->lastName);
+        $user->setIsDeleted($dto->isDeleted);
+        $user->setIsEmailVerified($dto->isEmailConfirmed);
+
+        return $user;
     }
 }

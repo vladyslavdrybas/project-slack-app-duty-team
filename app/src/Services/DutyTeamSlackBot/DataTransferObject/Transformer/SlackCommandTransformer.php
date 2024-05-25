@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\DutyTeamSlackBot\DataTransferObject\Transformer;
 
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
@@ -14,7 +14,7 @@ class SlackCommandTransformer
 {
     public function transform(SlackCommandInputDto $input): CommandDto
     {
-        $command = CommandList::tryFrom(substr($input->command, 1));
+        $command = CommandName::tryFrom(substr($input->command, 1));
 
         return new CommandDto(
             $input->token,

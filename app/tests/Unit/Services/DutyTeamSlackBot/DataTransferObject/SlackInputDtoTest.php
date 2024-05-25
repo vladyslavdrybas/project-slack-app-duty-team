@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services\DutyTeamSlackBot\DataTransferObject;
 
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
@@ -21,9 +21,9 @@ use App\Tests\UnitTestCase;
 
 class SlackInputDtoTest extends UnitTestCase
 {
-    public function testReceiveCommandCheckInputDto(): void
+    public function testReceiveAddSkillsInteractivityInputDto(): void
     {
-        $dto = $this->getAddSkillsCommandDto();
+        $dto = $this->getAddSkillsInteractivityDto();
 
         $this->assertObjectHasProperty('token', $dto);
         $this->assertObjectHasProperty('apiAppId', $dto);
@@ -31,17 +31,16 @@ class SlackInputDtoTest extends UnitTestCase
         $this->assertObjectHasProperty('team', $dto);
         $this->assertObjectHasProperty('channel', $dto);
         $this->assertObjectHasProperty('user', $dto);
-        $this->assertObjectHasProperty('command', $dto);
-        $this->assertObjectHasProperty('text', $dto);
-
-        $this->assertEquals($this->config()->get('SLACK_VERIFICATION_TOKEN'), $dto->token);
-        $this->assertEquals($this->config()->get('SLACK_APP_ID'), $dto->apiAppId);
+        $this->assertObjectHasProperty('type', $dto);
+        $this->assertObjectHasProperty('states', $dto);
+        $this->assertObjectHasProperty('actions', $dto);
 
         $this->assertInstanceOf(ISlackMessageIdentifier::class, $dto);
         $this->assertInstanceOf(TeamDto::class, $dto->getTeam());
         $this->assertInstanceOf(ChannelDto::class, $dto->getChannel());
         $this->assertInstanceOf(UserDto::class, $dto->getUser());
-        $this->assertInstanceOf(CommandList::class, $dto->getCommand());
+        $this->assertInstanceOf(StateCollection::class, $dto->getStates());
+        $this->assertInstanceOf(ActionCollection::class, $dto->getActions());
     }
 
     public function testReceiveInteractivityInputDto(): void
@@ -55,26 +54,26 @@ class SlackInputDtoTest extends UnitTestCase
         $this->assertObjectHasProperty('channel', $dto);
         $this->assertObjectHasProperty('user', $dto);
         $this->assertObjectHasProperty('type', $dto);
-        $this->assertObjectHasProperty('state', $dto);
+        $this->assertObjectHasProperty('states', $dto);
         $this->assertObjectHasProperty('actions', $dto);
 
         $this->assertInstanceOf(ISlackMessageIdentifier::class, $dto);
         $this->assertInstanceOf(TeamDto::class, $dto->getTeam());
         $this->assertInstanceOf(ChannelDto::class, $dto->getChannel());
         $this->assertInstanceOf(UserDto::class, $dto->getUser());
-        $this->assertInstanceOf(StateCollection::class, $dto->getState());
+        $this->assertInstanceOf(StateCollection::class, $dto->getStates());
         $this->assertInstanceOf(ActionCollection::class, $dto->getActions());
 
-        $this->assertEquals(2, $dto->state->count());
+        $this->assertEquals(2, $dto->states->count());
         $this->assertEquals(1, $dto->actions->count());
         $this->assertInstanceOf(IActionElement::class, $dto->getActions()->getIterator()->current());
     }
 
-    protected function getAddSkillsCommandDto(): CommandDto
+    protected function getAddSkillsInteractivityDto(): InteractivityDto
     {
-        $commandDto = $this->requestData()->getAddSkillsCommand();
-        $dto = $this->serializer()->denormalize($commandDto, SlackCommandInputDto::class);
-        $transformer = new SlackCommandTransformer();
+        $dto = $this->requestData()->getAddSkillsInteractivityMessage();
+        $dto = $this->serializer()->denormalize($dto, SlackInteractivityInputDto::class);
+        $transformer = new SlackInteractivityTransformer();
 
         return $transformer->transform($dto);
     }

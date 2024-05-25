@@ -5,7 +5,7 @@ namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
 use App\Entity\UserTimeOff;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\ButtonActionElement;
 use App\Services\SlackNotifier\Block\SlackActionsBlock;
@@ -21,10 +21,10 @@ class TimeOffCommandProcessor extends AbstractCommandProcessor
     public function process(SlackCommand $command): BotResponseDto
     {
         return match ($command->getCommandName()) {
-            CommandList::TimeOff => $this->interactivityForm($command),
-            CommandList::TimeOffBtnAdd => $this->add($command),
-            CommandList::TimeOffBtnShow => $this->show($command),
-            CommandList::TimeOffBtnRemove => $this->remove($command),
+            CommandName::TimeOff => $this->interactivityForm($command),
+            CommandName::TimeOffBtnAdd => $this->add($command),
+            CommandName::TimeOffBtnShow => $this->show($command),
+            CommandName::TimeOffBtnRemove => $this->remove($command),
             default => throw new \Exception('Time off command not defined.'),
         };
     }
@@ -156,7 +156,7 @@ class TimeOffCommandProcessor extends AbstractCommandProcessor
     {
         $data = $this->mineInteractivityDataFromCommand($command->getText());
         $this->slackInputLogger->debug(
-            sprintf('slack command %s data', CommandList::TimeOffBtnRemove->value),
+            sprintf('slack command %s data', CommandName::TimeOffBtnRemove->value),
             [$data]
         );
 
@@ -164,7 +164,7 @@ class TimeOffCommandProcessor extends AbstractCommandProcessor
 
         /** @var ButtonActionElement $action */
         foreach ($data->actions as $action) {
-            if (CommandList::TimeOffBtnRemove->value === $action->getActionId()) {
+            if (CommandName::TimeOffBtnRemove->value === $action->getActionId()) {
                 $timeOff = $this->entityManager->getRepository(UserTimeOff::class)->find($action->getValue());
                 if ($timeOff instanceof UserTimeOff) {
                     $this->entityManager->remove($timeOff);
@@ -177,20 +177,7 @@ class TimeOffCommandProcessor extends AbstractCommandProcessor
 
         $answer = new BotResponseDto($text);
 
-        $showCommand = new SlackCommand();
-        $showCommand->setCommandName(CommandList::TimeOffBtnShow);
-        $showCommand->setText(
-            sprintf(
-                '{"parentCommand":"%s","parentId":"%s"',
-                $command->getCommandName()->value,
-                $command->getRawId()
-            )
-        );
-        $showCommand->setTeam($command->getTeam());
-        $showCommand->setUser($command->getUser());
-        $showCommand->setChannel($command->getChannel());
-
-        $this->show($showCommand);
+        $this->show($command);
 
         return $answer;
     }

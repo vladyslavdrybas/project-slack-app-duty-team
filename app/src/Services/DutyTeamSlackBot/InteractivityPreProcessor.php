@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\IActionElement;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\InteractivityDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
@@ -20,19 +20,19 @@ class InteractivityPreProcessor extends AbstractPreProcessor
         return parent::process($dto);
     }
 
-    protected function getCommandName(ISlackMessageIdentifier|InteractivityDto $dto): CommandList
+    protected function getCommandName(ISlackMessageIdentifier|InteractivityDto $dto): CommandName
     {
         $command = null;
 
         foreach ($dto->getActions() as $action) {
             /** @var IActionElement $action */
-            $command = CommandList::tryFrom($action->getActionId());
+            $command = CommandName::tryFrom($action->getActionId());
             if (null !== $command) {
                 break;
             }
         }
 
-        if (!$command instanceof CommandList) {
+        if (!$command instanceof CommandName) {
             throw new \Exception("Cannot get action command");
         }
 

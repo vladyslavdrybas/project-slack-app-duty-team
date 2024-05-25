@@ -6,7 +6,7 @@
   "channel_name": "directmessage",
   "user_id": "U072CSZ2M2T",
   "user_name": "ukdvvw",
-  "command": "/skills-add",
+  "command": "/skills",
   "text": "php; javascript; docker; redis;",
   "api_app_id": "A072TBG8YEP",
   "is_enterprise_install": "false",

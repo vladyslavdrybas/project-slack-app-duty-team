@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
 
@@ -19,7 +19,7 @@ class CommandPreProcessor extends AbstractPreProcessor
         return parent::process($dto);
     }
 
-    protected function getCommandName(ISlackMessageIdentifier|CommandDto $dto): CommandList
+    protected function getCommandName(ISlackMessageIdentifier|CommandDto $dto): CommandName
     {
         return $dto->command;
     }

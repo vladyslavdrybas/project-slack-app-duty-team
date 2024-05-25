@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\DutyTeamSlackBot\Config;
 
-enum CommandList: string
+enum CommandName: string
 {
     case Skills = 'skills';
     case SkillsBtnAdd = 'skills-btn-add';

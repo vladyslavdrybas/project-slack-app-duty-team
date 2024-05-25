@@ -5,7 +5,7 @@ namespace App\Services\DutyTeamSlackBot;
 
 use App\Entity\SlackCommand;
 use App\Entity\UserSkills;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\BotResponseDto;
 use App\Services\SlackNotifier\Block\SlackActionsBlock;
 use App\Services\SlackNotifier\Block\SlackInputBlock;
@@ -20,10 +20,10 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
     public function process(SlackCommand $command): BotResponseDto
     {
         return match ($command->getCommandName()) {
-            CommandList::Skills => $this->interactivityForm($command),
-            CommandList::SkillsBtnAdd => $this->add($command),
-            CommandList::SkillsBtnShow => $this->show($command),
-            CommandList::SkillsBtnRemove => $this->remove($command),
+            CommandName::Skills => $this->interactivityForm($command),
+            CommandName::SkillsBtnAdd => $this->add($command),
+            CommandName::SkillsBtnShow => $this->show($command),
+            CommandName::SkillsBtnRemove => $this->remove($command),
             default => throw new \Exception('Skills command not defined.'),
         };
     }
@@ -102,14 +102,8 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
 
         $text = $data->states->offsetGet('skills-input-field')->value;
 
-        $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
-            'slackUser' => $command->getUser(),
-        ]);
+        $userSkills = $this->getSkillsByCommand($command);
 
-        if (null === $userSkills) {
-            $userSkills = new UserSkills();
-            $userSkills->setSlackUser($command->getUser());
-        }
         $hasSkillsAmount = count($userSkills->getSkills());
 
         $skills = array_values(
@@ -142,14 +136,8 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
 
         $text = $data->states->offsetGet('skills-input-field')->value;
 
-        $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
-            'slackUser' => $command->getUser(),
-        ]);
+        $userSkills = $this->getSkillsByCommand($command);
 
-        if (null === $userSkills) {
-            $userSkills = new UserSkills();
-            $userSkills->setSlackUser($command->getUser());
-        }
         $hasSkillsAmount = count($userSkills->getSkills());
 
         $skills = array_values(
@@ -177,9 +165,7 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
 
     protected function show(SlackCommand $command): BotResponseDto
     {
-        $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
-            'slackUser' => $command->getUser(),
-        ]);
+        $userSkills = $this->getSkillsByCommand($command);
 
         $answer = new BotResponseDto('');
 
@@ -191,6 +177,10 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
         $text = '';
         foreach ($userSkills->getSkills() as $skill) {
             $text .= ' `' . $skill . '` ';
+        }
+
+        if (0 === count($userSkills->getSkills())) {
+            $text = 'No skills yet.';
         }
 
         $slackOptions->block(
@@ -207,5 +197,19 @@ class SkillsCommandProcessor extends AbstractCommandProcessor
         );
 
         return $answer;
+    }
+
+    protected function getSkillsByCommand(SlackCommand $command): UserSkills
+    {
+        $userSkills = $this->entityManager->getRepository(UserSkills::class)->findOneBy([
+            'owner' => $command->getUser()->getOwner(),
+        ]);
+
+        if (null === $userSkills) {
+            $userSkills = new UserSkills();
+            $userSkills->setOwner($command->getUser()->getOwner());
+        }
+
+        return $userSkills;
     }
 }

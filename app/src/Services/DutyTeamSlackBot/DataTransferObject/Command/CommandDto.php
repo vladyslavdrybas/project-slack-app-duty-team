@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services\DutyTeamSlackBot\DataTransferObject\Command;
 
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
 use App\Services\DutyTeamSlackBot\DataTransferObject\TeamDto;
@@ -19,7 +19,7 @@ readonly class CommandDto implements ISlackMessageIdentifier
         public string $text,
         public string $apiAppId,
         public string $triggerId,
-        public ?CommandList $command = null
+        public ?CommandName $command = null
     ) {}
 
     public function getToken(): string
@@ -57,7 +57,7 @@ readonly class CommandDto implements ISlackMessageIdentifier
         return $this->triggerId;
     }
 
-    public function getCommand(): ?CommandList
+    public function getCommand(): ?CommandName
     {
         return $this->command;
     }

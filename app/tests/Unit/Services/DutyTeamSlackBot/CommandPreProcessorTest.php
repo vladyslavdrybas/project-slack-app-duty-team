@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services\DutyTeamSlackBot;
 
+use App\Builder\UserBuilder;
 use App\Entity\SlackChannel;
 use App\Entity\SlackTeam;
 use App\Entity\SlackUser;
@@ -10,10 +11,11 @@ use App\Repository\SlackChannelRepository;
 use App\Repository\SlackTeamRepository;
 use App\Repository\SlackUserRepository;
 use App\Services\DutyTeamSlackBot\CommandPreProcessor;
-use App\Services\DutyTeamSlackBot\Config\CommandList;
+use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
+use App\Services\DutyTeamSlackBot\Reader\SlackApiUserReader;
 use App\Tests\UnitTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -123,10 +125,6 @@ class CommandPreProcessorTest extends UnitTestCase
         $slackUser->setUserId($commandDto->user->userId);
         $slackUser->setUserName($commandDto->user->userName);
 
-        $slackTeam = new SlackTeam();
-        $slackTeam->setTeamId($commandDto->team->teamId);
-        $slackTeam->setTeamDomain($commandDto->team->teamDomain);
-
         $slackChannel = new SlackChannel();
         $slackChannel->setChannelId($commandDto->channel->channelId);
         $slackChannel->setChannelName($commandDto->channel->channelName);
@@ -135,11 +133,6 @@ class CommandPreProcessorTest extends UnitTestCase
         $slackUserRepository->expects($this->atLeastOnce())
             ->method('findOneBy')
             ->willReturn($slackUser);
-
-        $slackTeamRepository = $this->createMock(SlackTeamRepository::class);
-        $slackTeamRepository->expects($this->atLeastOnce())
-            ->method('findOneBy')
-            ->willReturn($slackTeam);
 
         $slackChannelRepository = $this->createMock(SlackChannelRepository::class);
         $slackChannelRepository->expects($this->atLeastOnce())
@@ -151,23 +144,23 @@ class CommandPreProcessorTest extends UnitTestCase
             ->method('getRepository')
             ->willReturnMap([
                 [SlackUser::class, $slackUserRepository],
-                [SlackTeam::class, $slackTeamRepository],
                 [SlackChannel::class, $slackChannelRepository],
             ]);
 
         $commandProcessor = new CommandPreProcessor(
             $this->mockParameterBag(),
             $entityManager,
-            $this->logger()
+            $this->logger(),
+            $this->createMock(SlackApiUserReader::class),
+            $this->createMock(UserBuilder::class)
         );
 
         $slackCommand = $commandProcessor->process($commandDto);
 
         $this->assertEquals($commandDto->text, $slackCommand->getText());
         $this->assertEquals($slackUser, $slackCommand->getUser());
-        $this->assertEquals($slackTeam, $slackCommand->getTeam());
         $this->assertEquals($slackChannel, $slackCommand->getChannel());
-        $this->assertEquals(CommandList::SkillsAdd, $slackCommand->getCommandName());
+        $this->assertEquals(CommandName::Skills, $slackCommand->getCommandName());
     }
 
     protected function getAddSkillsCommandDto(): CommandDto
@@ -184,7 +177,9 @@ class CommandPreProcessorTest extends UnitTestCase
         return new CommandPreProcessor(
             $this->mockParameterBag(),
             $this->createMock(EntityManagerInterface::class),
-            $this->logger()
+            $this->logger(),
+            $this->createMock(SlackApiUserReader::class),
+            $this->createMock(UserBuilder::class)
         );
     }
 }
