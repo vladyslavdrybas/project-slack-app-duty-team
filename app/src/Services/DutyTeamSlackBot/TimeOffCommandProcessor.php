@@ -16,6 +16,7 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
 use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 
+// TODO add user timezone recognition on timeoff
 class TimeOffCommandProcessor extends AbstractCommandProcessor
 {
     public function process(SlackCommand $command): BotResponseDto
