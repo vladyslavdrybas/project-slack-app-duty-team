@@ -12,9 +12,18 @@ use App\Repository\UserRepository;
 use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
 use App\Services\DutyTeamSlackBot\Reader\SlackApiUserReader;
+use App\Services\SlackNotifier\Block\SlackActionsBlock;
+use App\Services\SlackNotifier\Block\SlackDatePickerBlockElement;
+use App\Services\SlackNotifier\Block\SlackInputBlock;
+use App\Services\SlackNotifier\Block\SlackTextInputBlockElement;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackDividerBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackHeaderBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class AbstractPreProcessor
 {
@@ -23,7 +32,8 @@ abstract class AbstractPreProcessor
         protected readonly EntityManagerInterface $entityManager,
         protected readonly LoggerInterface $slackInputLogger,
         protected readonly SlackApiUserReader $slackApiUserReader,
-        protected readonly UserBuilder $userBuilder
+        protected readonly UserBuilder $userBuilder,
+        readonly protected HttpClientInterface $slackClient
     ) {}
 
     abstract protected function getCommandName(ISlackMessageIdentifier $dto): CommandName;
@@ -45,6 +55,7 @@ abstract class AbstractPreProcessor
         }
         $this->slackInputLogger->debug(__METHOD__,[$slackChannel]);
 
+
         $slackCommand = new SlackCommand();
         $slackCommand->setChannel($slackChannel);
         $slackCommand->setUser($slackUser);
@@ -56,6 +67,8 @@ abstract class AbstractPreProcessor
             $this->entityManager->persist($slackCommand);
             $this->entityManager->flush();
         }
+
+        $this->publishHomeView($slackCommand);
 
         return $slackCommand;
     }
@@ -165,5 +178,133 @@ abstract class AbstractPreProcessor
         $text = stripslashes($text);
 
         return $text;
+    }
+
+    protected function publishHomeView(SlackCommand $command): void
+    {
+        if ($command->getUser()->isHasView()) {
+            return;
+        }
+
+        $options = new SlackOptions([
+            'type' => 'home'
+        ]);
+
+        $options = $this->addSkillsBlock($options);
+        $options = $this->addBlocksDivider($options);
+        $options = $this->addTimeOffBlock($options);
+        $options = $this->addBlocksDivider($options);
+        $options = $this->addJiraBlock($options);
+        $options = $this->addBlocksDivider($options);
+
+        $response = $this->slackClient->request('POST', '/api/views.publish', [
+            'json' => [
+                'user_id' => $command->getUser()->getUserId(),
+                'view' => $options->toArray(),
+            ],
+        ]);
+
+
+        $content = $response->getContent();
+        $this->slackInputLogger->debug(__METHOD__, [$response->getInfo()]);
+        $this->slackInputLogger->debug(__METHOD__, [$content]);
+    }
+
+    protected function addBlocksDivider(SlackOptions $options): SlackOptions
+    {
+        return $options->block(new SlackDividerBlock());
+    }
+
+    protected function addTimeOffBlock(SlackOptions $options): SlackOptions
+    {
+        return $options
+            ->block(new SlackHeaderBlock('Add time off (vacation, holiday, day off, sickday etc.):'))
+            ->block(
+                (new SlackSectionBlock())
+                    ->text('Start date:')
+                    ->accessory(
+                        new SlackDatePickerBlockElement(
+                            new \DateTime('2024-12-30 10:45:55'),
+                            'timeoff-start-date',
+                            'Start date'
+                        )
+                    )
+            )
+            ->block(
+                (new SlackSectionBlock())
+                    ->text('End date:')
+                    ->accessory(
+                        new SlackDatePickerBlockElement(
+                            new \DateTime('2024-12-30 10:45:55'),
+                            'timeoff-end-date',
+                            'End date'
+                        )
+                    )
+            )
+            ->block(
+                (new SlackActionsBlock())
+                    ->buttonAction(
+                        'Add Time Off',
+                        'timeoff-btn-add',
+                        'timeoff-btn-add',
+                    )
+                    ->buttonAction(
+                        'Show All Time Off',
+                        'timeoff-btn-show',
+                        'timeoff-btn-show',
+                        'primary'
+                    )
+            );
+    }
+
+    protected function addSkillsBlock(SlackOptions $options): SlackOptions
+    {
+        return $options
+            ->block(new SlackHeaderBlock('Add skills that can be used to solve tasks:'))
+            ->block(
+                (new SlackInputBlock())
+                    ->label('Add skills. Split them via `;`')
+                    ->element(
+                        new SlackTextInputBlockElement('skills-input-field', true)
+                    )
+            )
+            ->block(
+                (new SlackActionsBlock())
+                    ->buttonAction(
+                        'Add Skills',
+                        'skills-btn-add',
+                        'skills-btn-add',
+                    )
+                    ->buttonAction(
+                        'Show All Skills',
+                        'skills-btn-show',
+                        'skills-btn-show'
+                    )
+            );
+    }
+
+    protected function addJiraBlock(SlackOptions $options): SlackOptions
+    {
+        return $options
+            ->block(new SlackHeaderBlock('Integrate with JIRA:'))
+            ->block(
+                (new SlackActionsBlock())
+                    ->buttonAction(
+                        'Connect to JIRA',
+                        'jira-btn-connect',
+                        'jira-btn-connect',
+                    )
+                    ->buttonAction(
+                        'Show JIRA details',
+                        'jira-btn-details',
+                        'jira-btn-details'
+                    )
+                    ->buttonAction(
+                        'Disconnect JIRA',
+                        'jira-btn-disconnect',
+                        'jira-btn-disconnect',
+                        'danger'
+                    )
+            );
     }
 }

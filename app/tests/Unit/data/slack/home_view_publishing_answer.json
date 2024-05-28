@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "view": {
+    "id": "V075AJ9P4TV",
+    "team_id": "T073G7T7JQY",
+    "app_id": "A072TBG8YEP",
+    "app_installed_team_id": "T073G7T7JQY",
+    "bot_id": "B072YBM2XNY",
+    "type": "home",
+    "blocks": [
+      {
+        "type": "section",
+        "block_id": "Zpnb2",
+        "text": {
+          "type": "mrkdwn",
+          "text": "This is a Block Kit example",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "image",
+          "image_url": "https://api.slack.com/img/blocks/bkb_template_images/notifications.png",
+          "alt_text": "calendar thumbnail"
+        }
+      },
+      {
+        "type": "actions",
+        "block_id": "XYsTZ",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Click Me",
+              "emoji": true
+            },
+            "action_id": "actionId-0",
+            "value": "click_me_123"
+          }
+        ]
+      }
+    ],
+    "state": {
+      "values": {}
+    },
+    "hash": "1716842027.7OUUFPfR",
+    "private_metadata": "",
+    "callback_id": "",
+    "root_view_id": "V075AJ9P4TV",
+    "external_id": "",
+    "title": {
+      "type": "plain_text",
+      "text": "View Title",
+      "emoji": true
+    },
+    "close": null,
+    "submit": null,
+    "previous_view_id": null,
+    "clear_on_close": false,
+    "notify_on_close": false
+  }
+}

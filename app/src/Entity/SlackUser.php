@@ -93,6 +93,9 @@ class SlackUser extends AbstractEntity
     #[ORM\Column(name: 'is_email_confirmed', type: Types::BOOLEAN, options: ['default' => false])]
     protected bool $isEmailConfirmed = false;
 
+    #[ORM\Column(name: 'has_view', type: Types::BOOLEAN, options: ['default' => false])]
+    protected bool $hasView = false;
+
     public function getOwner(): User
     {
         return $this->owner;
@@ -361,5 +364,15 @@ class SlackUser extends AbstractEntity
     public function setIsEmailConfirmed(bool $isEmailConfirmed): void
     {
         $this->isEmailConfirmed = $isEmailConfirmed;
+    }
+
+    public function isHasView(): bool
+    {
+        return $this->hasView;
+    }
+
+    public function setHasView(bool $hasView): void
+    {
+        $this->hasView = $hasView;
     }
 }

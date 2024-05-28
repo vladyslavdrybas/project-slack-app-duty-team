@@ -1,0 +1,247 @@
+{
+  "type": "block_actions",
+  "user": {
+    "id": "U072CSZ2M2T",
+    "username": "ukdvvw",
+    "name": "ukdvvw",
+    "team_id": "T073G7T7JQY"
+  },
+  "api_app_id": "A072TBG8YEP",
+  "token": "UJgP8ayNRekblYLwTfW9swvr",
+  "container": {
+    "type": "view",
+    "view_id": "V075AJ9P4TV"
+  },
+  "trigger_id": "7208483372416.7118265256848.d82f57397e1a89914aba64233b44016d",
+  "team": {
+    "id": "T073G7T7JQY",
+    "domain": "vladyslavdryb-tdt2059"
+  },
+  "enterprise": null,
+  "is_enterprise_install": false,
+  "view": {
+    "id": "V075AJ9P4TV",
+    "team_id": "T073G7T7JQY",
+    "type": "home",
+    "blocks": [
+      {
+        "type": "header",
+        "block_id": "Qy9xg",
+        "text": {
+          "type": "plain_text",
+          "text": "Add skills that can be used to solve tasks:",
+          "emoji": true
+        }
+      },
+      {
+        "type": "input",
+        "block_id": "0k5LL",
+        "label": {
+          "type": "plain_text",
+          "text": "Add skills. Split them via `;`",
+          "emoji": true
+        },
+        "optional": false,
+        "dispatch_action": false,
+        "element": {
+          "type": "plain_text_input",
+          "action_id": "skills-input-field",
+          "multiline": true,
+          "dispatch_action_config": {
+            "trigger_actions_on": [
+              "on_enter_pressed"
+            ]
+          }
+        }
+      },
+      {
+        "type": "actions",
+        "block_id": "vxY3a",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "skills-btn-add",
+            "text": {
+              "type": "plain_text",
+              "text": "Add Skills",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "skills-btn-add"
+          },
+          {
+            "type": "button",
+            "action_id": "skills-btn-remove",
+            "text": {
+              "type": "plain_text",
+              "text": "Remove Skills",
+              "emoji": true
+            },
+            "style": "danger",
+            "value": "skills-btn-remove"
+          },
+          {
+            "type": "button",
+            "action_id": "skills-btn-show",
+            "text": {
+              "type": "plain_text",
+              "text": "Show All Skills",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "skills-btn-show"
+          }
+        ]
+      },
+      {
+        "type": "divider",
+        "block_id": "+44vs"
+      },
+      {
+        "type": "header",
+        "block_id": "Uhagl",
+        "text": {
+          "type": "plain_text",
+          "text": "Add time off (vacation, holiday, day off, sickday etc.):",
+          "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "ncHNs",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Start date:",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "datepicker",
+          "action_id": "timeoff-start-date",
+          "initial_date": "2024-12-30",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "Start date",
+            "emoji": true
+          }
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "bigT1",
+        "text": {
+          "type": "mrkdwn",
+          "text": "End date:",
+          "verbatim": false
+        },
+        "accessory": {
+          "type": "datepicker",
+          "action_id": "timeoff-end-date",
+          "initial_date": "2024-12-30",
+          "placeholder": {
+            "type": "plain_text",
+            "text": "End date",
+            "emoji": true
+          }
+        }
+      },
+      {
+        "type": "actions",
+        "block_id": "ok9Yv",
+        "elements": [
+          {
+            "type": "button",
+            "action_id": "timeoff-btn-add",
+            "text": {
+              "type": "plain_text",
+              "text": "Add Time Off",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "timeoff-btn-add"
+          },
+          {
+            "type": "button",
+            "action_id": "timeoff-btn-remove",
+            "text": {
+              "type": "plain_text",
+              "text": "Remove Time Off",
+              "emoji": true
+            },
+            "style": "danger",
+            "value": "timeoff-btn-remove"
+          },
+          {
+            "type": "button",
+            "action_id": "timeoff-btn-show",
+            "text": {
+              "type": "plain_text",
+              "text": "Show All Time Off",
+              "emoji": true
+            },
+            "style": "primary",
+            "value": "timeoff-btn-show"
+          }
+        ]
+      },
+      {
+        "type": "divider",
+        "block_id": "T6odR"
+      }
+    ],
+    "private_metadata": "",
+    "callback_id": "",
+    "state": {
+      "values": {
+        "0k5LL": {
+          "skills-input-field": {
+            "type": "plain_text_input",
+            "value": null
+          }
+        },
+        "ncHNs": {
+          "timeoff-start-date": {
+            "type": "datepicker",
+            "selected_date": "2024-12-30"
+          }
+        },
+        "bigT1": {
+          "timeoff-end-date": {
+            "type": "datepicker",
+            "selected_date": "2024-12-30"
+          }
+        }
+      }
+    },
+    "hash": "1716913867.nJDJUrN5",
+    "title": {
+      "type": "plain_text",
+      "text": "View Title",
+      "emoji": true
+    },
+    "clear_on_close": false,
+    "notify_on_close": false,
+    "close": null,
+    "submit": null,
+    "previous_view_id": null,
+    "root_view_id": "V075AJ9P4TV",
+    "app_id": "A072TBG8YEP",
+    "external_id": "",
+    "app_installed_team_id": "T073G7T7JQY",
+    "bot_id": "B072YBM2XNY"
+  },
+  "actions": [
+    {
+      "action_id": "timeoff-btn-show",
+      "block_id": "ok9Yv",
+      "text": {
+        "type": "plain_text",
+        "text": "Show All Time Off",
+        "emoji": true
+      },
+      "value": "timeoff-btn-show",
+      "style": "primary",
+      "type": "button",
+      "action_ts": "1716915042.621237"
+    }
+  ]
+}

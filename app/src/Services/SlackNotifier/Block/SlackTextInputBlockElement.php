@@ -8,11 +8,12 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\AbstractSlackBlockElement;
 final class SlackTextInputBlockElement extends AbstractSlackBlockElement
 {
     public function __construct(
-        ?string $actionId = null
+        ?string $actionId = null,
+        bool $multiline = false
     ) {
         $this->options = [
             'type' => 'plain_text_input',
-            'multiline' => true,
+            'multiline' => $multiline,
             'action_id' => $actionId
         ];
     }

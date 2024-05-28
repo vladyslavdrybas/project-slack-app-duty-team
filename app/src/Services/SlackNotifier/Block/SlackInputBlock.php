@@ -11,6 +11,10 @@ final class SlackInputBlock extends AbstractSlackBlock
     public function __construct()
     {
         $this->options['type'] = 'input';
+        $this->options['label'] = [
+            'type' => 'plain_text',
+            'text' => '',
+        ];
     }
 
     public function element(SlackBlockElementInterface $element): self
