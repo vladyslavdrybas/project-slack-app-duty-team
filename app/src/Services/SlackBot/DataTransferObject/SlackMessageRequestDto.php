@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Services\SlackBot\DataTransferObject;
 
 use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Serializer\Annotation\SerializedPath;
 use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 

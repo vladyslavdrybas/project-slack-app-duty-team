@@ -16,7 +16,11 @@ class SlackMessageRequestDtoTest extends UnitTestCase
         $request = $this->requestData()->getUrlVerificationMessage();
 
         $request = $this->serializer()->serialize($request, 'json');
-        $dto = $this->serializer()->deserialize($request, SlackMessageRequestDto::class, 'json');
+        $dto = $this->serializer()->deserialize(
+            $request,
+            SlackMessageRequestDto::class,
+            'json'
+        );
 
         $this->assertObjectHasProperty('type', $dto);
         $this->assertObjectHasProperty('token', $dto);
@@ -28,7 +32,11 @@ class SlackMessageRequestDtoTest extends UnitTestCase
         $request = $this->requestData()->getEventOpenedHomeTabMessage();
 
         $request = $this->serializer()->serialize($request, 'json');
-        $dto = $this->serializer()->deserialize($request, SlackMessageRequestDto::class, 'json');
+        $dto = $this->serializer()->deserialize(
+            $request,
+            SlackMessageRequestDto::class,
+            'json'
+        );
 
         $this->assertObjectHasProperty('type', $dto);
         $this->assertObjectHasProperty('token', $dto);
@@ -45,7 +53,11 @@ class SlackMessageRequestDtoTest extends UnitTestCase
         $request = $this->requestData()->getEventOpenedMessagesTabMessage();
 
         $request = $this->serializer()->serialize($request, 'json');
-        $dto = $this->serializer()->deserialize($request, SlackMessageRequestDto::class, 'json');
+        $dto = $this->serializer()->deserialize(
+            $request,
+            SlackMessageRequestDto::class,
+            'json'
+        );
 
         $this->assertObjectHasProperty('type', $dto);
         $this->assertObjectHasProperty('token', $dto);
@@ -67,7 +79,6 @@ class SlackMessageRequestDtoTest extends UnitTestCase
             SlackMessageRequestDto::class,
             'json',
         );
-
 
         $this->assertObjectHasProperty('type', $dto);
         $this->assertObjectHasProperty('token', $dto);
