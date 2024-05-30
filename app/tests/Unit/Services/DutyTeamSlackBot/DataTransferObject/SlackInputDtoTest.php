@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services\DutyTeamSlackBot\DataTransferObject;
 
-use App\Services\DutyTeamSlackBot\Config\CommandName;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ChannelDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Command\CommandDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Command\SlackCommandInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\ActionCollection;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Blocks\StateCollection;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\IActionElement;
@@ -14,7 +11,6 @@ use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\Interactivity
 use App\Services\DutyTeamSlackBot\DataTransferObject\Interactivity\SlackInteractivityInputDto;
 use App\Services\DutyTeamSlackBot\DataTransferObject\ISlackMessageIdentifier;
 use App\Services\DutyTeamSlackBot\DataTransferObject\TeamDto;
-use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTransformer;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackInteractivityTransformer;
 use App\Services\DutyTeamSlackBot\DataTransferObject\UserDto;
 use App\Tests\UnitTestCase;

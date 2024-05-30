@@ -54,4 +54,24 @@ class RequestDataMock
     {
         return $this->getData($this->slackDataPath, 'interactivity_payload_timeoff_add.json', 'not-exist');
     }
+
+    public function getUrlVerificationMessage(): array
+    {
+        return $this->getData($this->slackDataPath, 'url_verification.json', 'url_verification');
+    }
+
+    public function getEventOpenedHomeTabMessage(): array
+    {
+        return $this->getData($this->slackDataPath, 'event_app_home_opened_home.json', 'event_app_home_opened_home');
+    }
+
+    public function getEventOpenedMessagesTabMessage(): array
+    {
+        return $this->getData($this->slackDataPath, 'event_app_home_opened_messages.json', 'event_app_home_opened_messages');
+    }
+
+    public function getHomeButtonClickMessage(): array
+    {
+        return $this->getData($this->slackDataPath, 'home_button_skills_show_response.json', 'home_button_skills_show_response');
+    }
 }

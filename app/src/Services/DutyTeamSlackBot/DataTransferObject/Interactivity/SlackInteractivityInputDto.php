@@ -25,12 +25,6 @@ readonly class SlackInteractivityInputDto
         #[SerializedPath('[team][domain]')]
         public string $teamDomain,
 
-        #[SerializedPath('[channel][id]')]
-        public string $channelId,
-
-        #[SerializedPath('[channel][name]')]
-        public string $channelName,
-
         #[SerializedPath('[user][id]')]
         public string $userId,
 
@@ -41,7 +35,16 @@ readonly class SlackInteractivityInputDto
         public array $states,
 
         #[SerializedName('actions')]
-        public array $actions
+        public array $actions,
+
+        #[SerializedPath('[container][type]')]
+        public string $containerType,
+
+        #[SerializedPath('[container][view_id]')]
+        public ?string $containerSourceId,
+
+        #[SerializedPath('[container][channel_id]')]
+        public ?string $channelId,
     ){
     }
 }

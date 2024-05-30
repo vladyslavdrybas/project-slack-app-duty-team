@@ -1,0 +1,346 @@
+{
+  "token": "UJgP8ayNRekblYLwTfW9swvr",
+  "team_id": "T073G7T7JQY",
+  "api_app_id": "A072TBG8YEP",
+  "event": {
+    "type": "app_home_opened",
+    "user": "U072CSZ2M2T",
+    "channel": "D073JLYEMQQ",
+    "tab": "home",
+    "view": {
+      "id": "V075AJ9P4TV",
+      "team_id": "T073G7T7JQY",
+      "type": "home",
+      "blocks": [
+        {
+          "type": "header",
+          "block_id": "iACYh",
+          "text": {
+            "type": "plain_text",
+            "text": "Add skills that can be used to solve tasks:",
+            "emoji": true
+          }
+        },
+        {
+          "type": "input",
+          "block_id": "Nq3uI",
+          "label": {
+            "type": "plain_text",
+            "text": "Add skills. Split them via `;`",
+            "emoji": true
+          },
+          "optional": false,
+          "dispatch_action": false,
+          "element": {
+            "type": "plain_text_input",
+            "action_id": "skills-input-field",
+            "multiline": true,
+            "dispatch_action_config": {
+              "trigger_actions_on": [
+                "Over 9 levels deep, aborting normalization"
+              ]
+            }
+          }
+        },
+        {
+          "type": "actions",
+          "block_id": "fd/P6",
+          "elements": [
+            {
+              "type": "button",
+              "action_id": "skills-btn-add",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "skills-btn-add"
+            },
+            {
+              "type": "button",
+              "action_id": "skills-btn-show",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "skills-btn-show"
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "block_id": "iCWT9"
+        },
+        {
+          "type": "header",
+          "block_id": "aEid1",
+          "text": {
+            "type": "plain_text",
+            "text": "Add time off (vacation, holiday, day off, sickday etc.):",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "block_id": "YsPo7",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Start date:",
+            "verbatim": false
+          },
+          "accessory": {
+            "type": "datepicker",
+            "action_id": "timeoff-start-date",
+            "initial_date": "2024-12-30",
+            "placeholder": {
+              "type": "plain_text",
+              "text": "Start date",
+              "emoji": true
+            }
+          }
+        },
+        {
+          "type": "section",
+          "block_id": "R47Rs",
+          "text": {
+            "type": "mrkdwn",
+            "text": "End date:",
+            "verbatim": false
+          },
+          "accessory": {
+            "type": "datepicker",
+            "action_id": "timeoff-end-date",
+            "initial_date": "2024-12-30",
+            "placeholder": {
+              "type": "plain_text",
+              "text": "End date",
+              "emoji": true
+            }
+          }
+        },
+        {
+          "type": "actions",
+          "block_id": "4hZwK",
+          "elements": [
+            {
+              "type": "button",
+              "action_id": "timeoff-btn-add",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "timeoff-btn-add"
+            },
+            {
+              "type": "button",
+              "action_id": "timeoff-btn-show",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "timeoff-btn-show"
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "block_id": "JOO2j"
+        },
+        {
+          "type": "header",
+          "block_id": "PYApI",
+          "text": {
+            "type": "plain_text",
+            "text": "Add teammates to shift with on a day:",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "block_id": "TIYr7",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Shift date:",
+            "verbatim": false
+          },
+          "accessory": {
+            "type": "datepicker",
+            "action_id": "shift-date",
+            "initial_date": "2024-12-30",
+            "placeholder": {
+              "type": "plain_text",
+              "text": "Shift date",
+              "emoji": true
+            }
+          }
+        },
+        {
+          "type": "input",
+          "block_id": "g2JB9",
+          "label": {
+            "type": "plain_text",
+            "text": "Teammates to shift with on a day:",
+            "emoji": true
+          },
+          "optional": false,
+          "dispatch_action": false,
+          "element": {
+            "type": "plain_text_input",
+            "action_id": "shift-input-field",
+            "multiline": false,
+            "dispatch_action_config": {
+              "trigger_actions_on": [
+                "Over 9 levels deep, aborting normalization"
+              ]
+            }
+          }
+        },
+        {
+          "type": "actions",
+          "block_id": "0Nglu",
+          "elements": [
+            {
+              "type": "button",
+              "action_id": "shift-btn-add",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "shift-btn-add"
+            },
+            {
+              "type": "button",
+              "action_id": "shift-btn-show",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "shift-btn-show"
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "block_id": "1F+8A"
+        },
+        {
+          "type": "header",
+          "block_id": "jUGGj",
+          "text": {
+            "type": "plain_text",
+            "text": "Integrate with JIRA:",
+            "emoji": true
+          }
+        },
+        {
+          "type": "actions",
+          "block_id": "uMixD",
+          "elements": [
+            {
+              "type": "button",
+              "action_id": "jira-btn-connect",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "jira-btn-connect"
+            },
+            {
+              "type": "button",
+              "action_id": "jira-btn-details",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "primary",
+              "value": "jira-btn-details"
+            },
+            {
+              "type": "button",
+              "action_id": "jira-btn-disconnect",
+              "text": {
+                "type": "Over 9 levels deep, aborting normalization",
+                "text": "Over 9 levels deep, aborting normalization",
+                "emoji": "Over 9 levels deep, aborting normalization"
+              },
+              "style": "danger",
+              "value": "jira-btn-disconnect"
+            }
+          ]
+        },
+        {
+          "type": "divider",
+          "block_id": "gODqP"
+        }
+      ],
+      "private_metadata": "",
+      "callback_id": "",
+      "state": {
+        "values": {
+          "YsPo7": {
+            "timeoff-start-date": {
+              "type": "datepicker",
+              "selected_date": "2024-12-30"
+            }
+          },
+          "R47Rs": {
+            "timeoff-end-date": {
+              "type": "datepicker",
+              "selected_date": "2024-12-30"
+            }
+          },
+          "TIYr7": {
+            "shift-date": {
+              "type": "datepicker",
+              "selected_date": "2024-12-30"
+            }
+          }
+        }
+      },
+      "hash": "1716917249.AlwaW2ad",
+      "title": {
+        "type": "plain_text",
+        "text": "View Title",
+        "emoji": true
+      },
+      "clear_on_close": false,
+      "notify_on_close": false,
+      "close": null,
+      "submit": null,
+      "previous_view_id": null,
+      "root_view_id": "V075AJ9P4TV",
+      "app_id": "A072TBG8YEP",
+      "external_id": "",
+      "app_installed_team_id": "T073G7T7JQY",
+      "bot_id": "B072YBM2XNY"
+    },
+    "event_ts": "1716939086.524860"
+  },
+  "type": "event_callback",
+  "event_id": "Ev0766C4RE3A",
+  "event_time": 1716939086,
+  "authorizations": [
+    {
+      "enterprise_id": null,
+      "team_id": "T073G7T7JQY",
+      "user_id": "U072VPS2VQT",
+      "is_bot": true,
+      "is_enterprise_install": false
+    }
+  ],
+  "is_ext_shared_channel": false
+}
