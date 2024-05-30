@@ -11,7 +11,6 @@ readonly class SlackMessageRequestDto
 {
     public function __construct(
         public string $type,
-
         public string $token,
 
         #[SerializedName('api_app_id')]
@@ -26,7 +25,6 @@ readonly class SlackMessageRequestDto
         public ?string           $eventId,
 
         public ?TeamDto          $team,
-
         public ?UserDto          $user,
         public ?EventDto         $event,
         public ?ViewDto          $view,

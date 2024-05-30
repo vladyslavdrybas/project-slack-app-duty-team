@@ -7,6 +7,4 @@ interface ISlackMessage
 {
     public function getToken(): string;
     public function getType(): string;
-    public function getApiAppId(): string;
-
 }
