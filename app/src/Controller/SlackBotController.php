@@ -9,6 +9,7 @@ use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackCommandTra
 use App\Services\DutyTeamSlackBot\CommandProcessor;
 use App\Services\DutyTeamSlackBot\DataTransferObject\Transformer\SlackInteractivityTransformer;
 use App\Services\DutyTeamSlackBot\InteractivityPreProcessor;
+use App\Services\SlackBot\DataTransferObject\SlackMessageRequestDto;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -29,7 +30,22 @@ class SlackBotController extends AbstractController
         Request $request,
         LoggerInterface $slackInputLogger
     ): JsonResponse {
-        $slackInputLogger->debug('slack message request',[$request->getPathInfo(), $request->getPayload()->all()]);
+        try {
+            $slackInputLogger->debug('slack message request',[$request->getPathInfo(), $request->getPayload()->all()]);
+            $dto = $this->serializer->deserialize(
+                $request,
+                SlackMessageRequestDto::class,
+                'json'
+            );
+            $slackInputLogger->debug('slack message input dto', [$dto]);
+
+            
+
+        } catch (\Exception $e) {
+            $slackInputLogger->error($e->getMessage());
+
+            throw $e;
+        }
 
         return $this->json([
             'challenge' => $request->getPayload()->get('challenge')
